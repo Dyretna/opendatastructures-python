@@ -68,14 +68,19 @@ class TreQueue:
         self.mid.add_all(0, temp2)
         self.right.add_all(0, temp3)
 
+
+    def rotate_left(self, r):
+        pass
+
+    def rotate_right(self, r):
+        pass
+
+
     # --------------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------------
 
     def _get_block_and_idx(self, i, adding:bool = False):
-
-        # with love, thought and time, this could probably be optimized
-        # but its a banger helper method.
 
         self._validate_i(i, adding=adding)
         if not all([self.left.n, self.mid.n, self.right.n]):
@@ -127,5 +132,13 @@ class TreQueue:
 
         return ordered_c
 
+    def __lshift__(self, r):
+        self.rotate_left(r)
+
+    def __rshift__(self, r):
+        self.rotate_right(r)
+
     def __str__(self):
-        return f"{self._get_ordered_collection()}"
+        arr_strings = [self.left.__str__(), self.mid.__str__(), self.right.__str__()]
+        return f"Ordered: {self._get_ordered_collection()}\n" + \
+                "Deques:\n" + "\n".join(arr_strings)
