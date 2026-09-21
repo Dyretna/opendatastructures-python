@@ -26,7 +26,7 @@ class ArrayStack:
         self.a[i] = x
         self.n += 1
 
-    def remove(self, i):
+    def remove(self, i:int):
         x = self.a[i]
 
         # shift left
