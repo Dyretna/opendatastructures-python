@@ -1,7 +1,7 @@
 from math import ceil
 from typing import Any
 
-from .array_deques import ArrayDeque
+from .array_deque import ArrayDeque
 
 
 class TreQueue:
