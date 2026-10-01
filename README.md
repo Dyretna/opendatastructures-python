@@ -1,6 +1,6 @@
 # opendatastructures-python
 
-This repository contains my personal implementations, notes, and experiments based on Pat Morin’s Open Data Structures – Pseudocode Edition. I began the project in September 2026 and I’m working through the book at a steady pace, roughly one chapter per week. It’s part of my ongoing self‑study while searching for a job after completing a Python and AI development program.
+This repository contains my personal implementations, notes, and experiments based on Pat Morin’s Open Data Structures – Pseudocode Edition. I began the project in September 2026 and I’m working through the book at a pretty slow but steady pace.
 
 I start by testing Morin’s original pseudocode implementations in a Jupyter notebook to understand their behavior and verify the logic. Once I’m comfortable with the reference version, I move on to a separate notebook where I solve the exercises and write my own Python implementations from scratch. I have dividided the repo into chapters, and each chapter has their own collection of implementations.
 

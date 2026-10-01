@@ -163,4 +163,5 @@ class ArrayDequeNoMod:
         self.rotate_right(r)
 
     def __str__(self):
-        return f"a: {self.a} \nn: {self.n},  j: {self.j}, size: {self.size}"
+        items = [self.get(i) for i in range(self.n)]
+        return f"[{', '.join(str(x) for x in items)}]  (n={self.n}, j={self.j})"

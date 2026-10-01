@@ -9,23 +9,13 @@ class Node:
 
 # ------------------------------------------
 
-class SingleLinkedList:
+class SLList:
     """
     Attributes
     ----------
     n : int, number of Nodes
     head : Optional[Node], first (left) node
     tail : Optional[Node], last (right) node
-
-    Methods
-    -------
-    - stack operations - constant time:
-        - push(x)
-        - pop()
-
-    - queue operations - constant time:
-        - add(x)
-        - remove()
 
     Theorem
     -------

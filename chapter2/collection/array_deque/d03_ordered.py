@@ -21,7 +21,7 @@ class ArrayDequeOrdered:
         self.min_size = min_size
         self.size = self.min_size
 
-        self.middle = self.size // 2
+        self.middle = self.size >> 1
         # att init - they are inverted,
         # since they step inside add before adding.
         self.left_pointer = self.middle
@@ -67,13 +67,13 @@ class ArrayDequeOrdered:
         return val
 
     def rebuild(self):
-        self.size *= 2
+        self.size <<= 1
         b = [None] * self.size
 
         old_lp = self.left_pointer
         old_rp = self.right_pointer
 
-        self.left_pointer = (self.size // 4) + 1
+        self.left_pointer = (self.size >> 2) + 1
         self.right_pointer = self.left_pointer + self.n - 1
 
         b[self.left_pointer:self.right_pointer + 1] = self.a[old_lp:old_rp + 1]
