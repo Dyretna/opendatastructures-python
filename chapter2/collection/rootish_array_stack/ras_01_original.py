@@ -1,5 +1,6 @@
 from math import ceil, sqrt
 import copy
+from typing import Any
 
 from ..array_stack import ArrayStack
 
@@ -10,12 +11,12 @@ class RootishArrayStack:
         # stack of blocks; each block is a Python list
         self.blocks = ArrayStack()
 
-    def i2b(self, i):
+    def i2b(self, i:int):
         # compute block index b that contains element at list index i (0-based)
         # solve (b+1)(b+2)/2 >= i+1 and take the ceiling of the positive root
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
-    def get(self, i):
+    def get(self, i:int):
         # bounds check
         if i < 0 or i >= self.n:
             raise IndexError("index out of range")
@@ -24,7 +25,7 @@ class RootishArrayStack:
         j = i - b * (b + 1) // 2
         return self.blocks.get(b)[j]
 
-    def set(self, i, x):
+    def set(self, i:int, x:Any):
         # bounds check
         if i < 0 or i >= self.n:
             raise IndexError("index out of range")
@@ -35,7 +36,7 @@ class RootishArrayStack:
         self.blocks.get(b)[j] = x
         return old
 
-    def add(self, i, x):
+    def add(self, i:int, x:Any):
         # insert x at index i (0 <= i <= n)
         if i < 0 or i > self.n:
             raise IndexError("index out of range")
@@ -60,7 +61,7 @@ class RootishArrayStack:
         # append at the end of blocks
         self.blocks.add(self.blocks.n, new_block)
 
-    def remove(self, i):
+    def remove(self, i:int):
         # remove and return element at index i
         if i < 0 or i >= self.n:
             raise IndexError("index out of range")

@@ -1,3 +1,5 @@
+from typing import Any
+
 class ArrayQeue:
     """
     We use modulus on the length of array, which makes it circular
@@ -9,7 +11,7 @@ class ArrayQeue:
         self.j = 0  # keeps track of next element to remove
         self.n = 0
 
-    def add(self, x):
+    def add(self, x:Any):
         if self.n + 1 > len(self.a):
             self.resize()
         self.a[(self.j + self.n) % len(self.a)] = x

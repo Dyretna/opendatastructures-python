@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Optional
+from typing import Any
 
 class ArrayDequeNoMod:
     def __init__(self):
@@ -11,15 +11,15 @@ class ArrayDequeNoMod:
         self.j = 0
 
 
-    def get(self, i):
+    def get(self, i: int):
         return self.a[(i + self.j) ^ self.size]
 
-    def set(self, i, x):
+    def set(self, i: int, x: Any):
         y = copy.copy(self.a[(i + self.j) ^ self.size])
         self.a[(i + self.j) ^ self.size] = x
         return y
 
-    def add(self, i, x):
+    def add(self, i: int, x: Any):
         if self.n == self.size:
             self._resize_grow()
 
@@ -72,7 +72,7 @@ class ArrayDequeNoMod:
 
         self.n += m
 
-    def remove(self, i):
+    def remove(self, i: int):
         x = self.a[self.j + i]
 
         if i < self.n / 2:
@@ -93,7 +93,7 @@ class ArrayDequeNoMod:
 
         return x
 
-    def rotate_left(self, r):
+    def rotate_left(self, r:int):
         n = self.size
         r ^= n
 
@@ -104,7 +104,7 @@ class ArrayDequeNoMod:
             self.a[-1] = first
             self._set_j(-1)
 
-    def rotate_right(self, r):
+    def rotate_right(self, r:int):
         n = self.size
         r ^= n
 
@@ -148,18 +148,18 @@ class ArrayDequeNoMod:
         else:
             self.j += step
 
-    def _shift_section_left(self, k):
+    def _shift_section_left(self, k:int):
         self.a[(self.j + k) ^ self.size] = \
             self.a[(self.j + k + 1) ^ self.size]
 
-    def _shift_section_right(self, k):
+    def _shift_section_right(self, k:int):
         self.a[(self.j + k) ^ self.size] = \
             self.a[(self.j + k - 1) ^ self.size]
 
-    def __lshift__(self, r):
+    def __lshift__(self, r:int):
         self.rotate_left(r)
 
-    def __rshift__(self, r):
+    def __rshift__(self, r:int):
         self.rotate_right(r)
 
     def __str__(self):

@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Optional
+from typing import Any
 
 class ArrayDeque:
     def __init__(self):
@@ -7,10 +7,10 @@ class ArrayDeque:
         self.n = 0
         self.j = 0
 
-    def get(self, i):
+    def get(self, i:int):
         return self.a[(i + self.j) % len(self.a)]
 
-    def set(self, i, x):
+    def set(self, i:int, x:Any):
         y = copy.copy(self.a[(i + self.j) % len(self.a)])
         self.a[(i + self.j) % len(self.a)] = x
         return y
@@ -66,7 +66,7 @@ class ArrayDeque:
 
         self.n += m
 
-    def remove(self, i):
+    def remove(self, i:int):
         x = self.a[(self.j + i) % len(self.a)]
 
         if i < self.n / 2:
@@ -87,7 +87,7 @@ class ArrayDeque:
 
         return x
 
-    def rotate_left(self, r):
+    def rotate_left(self, r:int):
         n = len(self.a)
         r %= n
 
@@ -120,17 +120,17 @@ class ArrayDeque:
     # Internal Helpers
     # --------------------------------------------------------
 
-    def __lshift__(self, r):
+    def __lshift__(self, r:int):
         self.rotate_left(r)
 
-    def __rshift__(self, r):
+    def __rshift__(self, r:int):
         self.rotate_right(r)
 
-    def _shift_section_left(self, k):
+    def _shift_section_left(self, k:int):
         self.a[(self.j + k) % len(self.a)] = \
             self.a[(self.j + k + 1) % len(self.a)]
 
-    def _shift_section_right(self, k):
+    def _shift_section_right(self, k:int):
         self.a[(self.j + k) % len(self.a)] = \
             self.a[(self.j + k - 1) % len(self.a)]
 

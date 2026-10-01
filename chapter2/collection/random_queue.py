@@ -1,12 +1,14 @@
 import random
 from math import ceil
+from typing import Any
+
 
 class RandomQeue:
     def __init__(self):
         self.a = []
         self.n = 0
 
-    def add(self, x):
+    def add(self, x:Any):
         if self.n == len(self.a):
             self.resize()
         self.a[self.n] = x

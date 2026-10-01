@@ -194,7 +194,6 @@ class SEList:
 
         u = self.dummy.next
         while u != self.dummy:
-            # visa hela blocket, inklusive None
             block = []
             for raw_idx in range(u.d.n):
                 block.append(u.d.get(raw_idx))

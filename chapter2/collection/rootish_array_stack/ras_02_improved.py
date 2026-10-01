@@ -1,5 +1,6 @@
 from math import ceil, sqrt
 import copy
+from typing import Any
 
 from ..array_stack import ArrayStack
 
@@ -8,7 +9,7 @@ class ImprovedRAS:
         self.n = 0
         self.blocks = ArrayStack()
 
-    def i2b(self, i):
+    def i2b(self, i:int):
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i):
@@ -19,7 +20,7 @@ class ImprovedRAS:
         j = i - b * (b + 1) // 2
         return self.blocks.get(b)[j]
 
-    def set(self, i, x):
+    def set(self, i:int, x:Any):
         # bounds check
         if i < 0 or i >= self.n:
             raise IndexError("index out of range")
@@ -30,7 +31,7 @@ class ImprovedRAS:
         self.blocks.get(b)[j] = x
         return old
 
-    def add(self, i, x):
+    def add(self, i:int, x:Any):
         # insert x at index i (0 <= i <= n)
         if i < 0 or i > self.n:
             raise IndexError("index out of range")
@@ -57,7 +58,7 @@ class ImprovedRAS:
                 self.set(j, self.get(j - 1))
             self.set(i, x)
 
-    def remove(self, i):
+    def remove(self, i:int):
         # remove and return element at index i
         if i < 0 or i >= self.n:
             raise IndexError("index out of range")

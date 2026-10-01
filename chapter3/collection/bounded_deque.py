@@ -83,10 +83,10 @@ class BDeque:
     def _get_idx(self, i:int):
         return (self.j + i) % self.capacity
 
-    def _shift_section_left(self, i):
+    def _shift_section_left(self, i:int):
         self.a[self._get_idx(i)] = self.a[self._get_idx(i + 1)]
 
-    def _shift_section_right(self, i):
+    def _shift_section_right(self, i:int):
         self.a[self._get_idx(i)] = self.a[self._get_idx(i - 1)]
 
 
