@@ -40,7 +40,7 @@ class ImprovedRAS:
         # while total capacity < n+1, grow
         r = self.blocks.n
         while r * (r + 1) // 2 < self.n + 1:
-            self.grow()
+            self._grow()
             r = self.blocks.n
 
         self.n += 1
@@ -75,18 +75,24 @@ class ImprovedRAS:
                 self.set(j, self.get(j + 1))
 
         self.n -= 1
-        self.shrink()
+        self._shrink()
 
         return x
 
-    def grow(self):
+    # ---------------------------------------------------
+    # internal helpers - grow, shrink
+    # ---------------------------------------------------
+
+    def _grow(self):
         # add a new block of size r+1 (filled with None)
         r = self.blocks.n
         new_block = [None] * (r + 1)
         # append at the end of blocks
         self.blocks.add(self.blocks.n, new_block)
 
-    def shrink(self):
+    def _shrink(self):
+        # optional separate shrink method:
+        # remove trailing blocks while capacity is excessive
         r = self.blocks.n
         while r > 0 and (r - 2) * (r - 1) // 2 >= self.n:
             self.blocks.remove(self.blocks.n - 1)

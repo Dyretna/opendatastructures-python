@@ -12,11 +12,18 @@ class ArrayDequeNoMod:
 
 
     def get(self, i: int):
-        return self.a[(i + self.j) ^ self.size]
+        if i + self.j >= self.size:
+            return self.a[(i + self.j) ^ self.size]
+        else:
+            return self.a[i + self.j]
 
     def set(self, i: int, x: Any):
-        y = copy.copy(self.a[(i + self.j) ^ self.size])
-        self.a[(i + self.j) ^ self.size] = x
+        if i + self.j >= self.size:
+            y = copy.copy(self.a[(i + self.j) ^ self.size])
+            self.a[(i + self.j) ^ self.size] = x
+        else:
+            y = copy.copy(self.a[i + self.j])
+            self.a[i + self.j] = x
         return y
 
     def add(self, i: int, x: Any):
