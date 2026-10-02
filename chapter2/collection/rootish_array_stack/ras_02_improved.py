@@ -75,7 +75,10 @@ class ImprovedRAS:
                 self.set(j, self.get(j + 1))
 
         self.n -= 1
-        self._shrink()
+
+        r = self.blocks.n
+        if ((r - 2) * (r - 1)) / 2 >= self.n:
+            self._shrink()
 
         return x
 
@@ -97,3 +100,14 @@ class ImprovedRAS:
         while r > 0 and (r - 2) * (r - 1) // 2 >= self.n:
             self.blocks.remove(self.blocks.n - 1)
             r -= 1
+
+    def __str__(self):
+        out = []
+        out.append("\n=== Improved RootishArrayStack ===")
+        out.append(f"n : {self.n}")
+
+        blocks = "\n".join(
+            [f"block {i:^3}: {block}" for i, block in enumerate(self.blocks.a)]
+        )
+        out.append(blocks)
+        return "\n".join(out)

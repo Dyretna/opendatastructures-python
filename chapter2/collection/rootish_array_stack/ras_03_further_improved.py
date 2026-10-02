@@ -39,7 +39,7 @@ class FurtherImprovedRAS:
         # while total capacity < n+1, grow
         r = self.blocks.n
         while r * (r + 1) // 2 < self.n + 1:
-            self.grow()
+            self._grow()
             r = self.blocks.n
 
         self.n += 1
@@ -74,25 +74,37 @@ class FurtherImprovedRAS:
                 self.set(j, self.get(j + 1))
 
         self.n -= 1
-        self.shrink()
+
+        r = self.blocks.n
+        if ((r - 2) * (r - 1)) / 2 >= self.n:
+            self._shrink()
 
         return x
 
-    def grow(self):
+    # ---------------------------------------------------
+    # internal helpers
+    # ---------------------------------------------------
+
+    def _grow(self):
         # add a new block of size r+1 (filled with None)
         r = self.blocks.n
         new_block = [None] * (r + 1)
         # append at the end of blocks
         self.blocks.add(self.blocks.n, new_block)
 
-    def shrink(self):
+    def _shrink(self):
         r = self.blocks.n
         while r > 0 and (r - 2) * (r - 1) // 2 >= self.n:
             self.blocks.remove(self.blocks.n - 1)
             r -= 1
 
-
     def __str__(self):
-        return "\n".join(
-            [f"{i:^3} {block}" for i, block in enumerate(self.blocks.a)]
+        out = []
+        out.append("\n=== Further Improved RootishArrayStack ===")
+        out.append(f"n : {self.n}")
+
+        blocks = "\n".join(
+            [f"block {i:^3}: {block}" for i, block in enumerate(self.blocks.a)]
         )
+        out.append(blocks)
+        return "\n".join(out)
