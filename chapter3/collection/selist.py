@@ -61,7 +61,7 @@ class SEList:
 
     def add(self, i:int, x:Any):
 
-        # 1. if we add to end - simply append
+        # if we add to end - simply append
         if i == self.n:
             self.append(x)
             return

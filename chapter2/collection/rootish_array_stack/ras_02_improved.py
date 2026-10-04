@@ -4,6 +4,7 @@ from typing import Any
 
 from ..array_stack import ArrayStack
 
+
 class ImprovedRAS:
     def __init__(self):
         self.n = 0
@@ -13,29 +14,20 @@ class ImprovedRAS:
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i):
-        if i < 0 or i >= self.n:
-            raise IndexError("index out of range")
         b = self.i2b(i)
         # j is the index inside block b
         j = i - b * (b + 1) // 2
         return self.blocks.get(b)[j]
 
     def set(self, i:int, x:Any):
-        # bounds check
-        if i < 0 or i >= self.n:
-            raise IndexError("index out of range")
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
         # return a shallow copy of the old value, then replace it
-        old = copy.copy(self.blocks.get(b)[j])
+        old = self.blocks.get(b)[j]
         self.blocks.get(b)[j] = x
         return old
 
     def add(self, i:int, x:Any):
-        # insert x at index i (0 <= i <= n)
-        if i < 0 or i > self.n:
-            raise IndexError("index out of range")
-
         # ensure there is room for one more element:
         # while total capacity < n+1, grow
         r = self.blocks.n
@@ -59,10 +51,6 @@ class ImprovedRAS:
             self.set(i, x)
 
     def remove(self, i:int):
-        # remove and return element at index i
-        if i < 0 or i >= self.n:
-            raise IndexError("index out of range")
-
         x = self.get(i)
 
         if i < self.n // 2:
@@ -75,10 +63,7 @@ class ImprovedRAS:
                 self.set(j, self.get(j + 1))
 
         self.n -= 1
-
-        r = self.blocks.n
-        if ((r - 2) * (r - 1)) / 2 >= self.n:
-            self._shrink()
+        self._shrink()
 
         return x
 
@@ -97,17 +82,34 @@ class ImprovedRAS:
         # optional separate shrink method:
         # remove trailing blocks while capacity is excessive
         r = self.blocks.n
-        while r > 0 and (r - 2) * (r - 1) // 2 >= self.n:
-            self.blocks.remove(self.blocks.n - 1)
+
+        while r > 0 and ((r-1) * (r-2)) // 2 >= self.n:
+            self.blocks.a[r - 1] = None
+            self.blocks.remove(r - 1)
             r -= 1
 
     def __str__(self):
+        """Displays blocks with zombie values masked as None.
+
+        Keeps implementation faithful to pseudocode and optimized:
+        - Zombie values not cleared in remove() (left for natural overwrite)
+        - Same block lists reused (no new allocations on add)
+        - Output shows only visible elements within current n
+        """
+
         out = []
         out.append("\n=== Improved RootishArrayStack ===")
-        out.append(f"n : {self.n}")
+        out.append(f"elements           : {self.n}")
+        out.append(f"logical blocks     : {self.blocks.n}")
+        out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
 
-        blocks = "\n".join(
-            [f"block {i:^3}: {block}" for i, block in enumerate(self.blocks.a)]
-        )
-        out.append(blocks)
+        for i in range(self.blocks.n):
+            block = self.blocks.get(i)
+            b_start = i * (i + 1) // 2
+            remaining_elements = max(0, self.n - b_start)
+            visible_count = min(len(block), remaining_elements)
+
+            display = block[:visible_count] + [None] * (len(block) - visible_count)
+            out.append(f"block {i:^3}: {display}")
+
         return "\n".join(out)

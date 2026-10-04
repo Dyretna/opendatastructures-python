@@ -26,7 +26,7 @@ class RootishArrayStack:
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
         # return a shallow copy of the old value, then replace it
-        y = copy.copy(self.blocks.get(b)[j])
+        y = self.blocks.get(b)[j]
         self.blocks.get(b)[j] = x
         return y
 
@@ -70,21 +70,33 @@ class RootishArrayStack:
         # optional separate shrink method:
         # remove trailing blocks while capacity is excessive
         r = self.blocks.n
-        while r > 0 and ((r - 1) * r) // 2 >= self.n:
+        while r > 0 and ((r-1) * (r-2)) // 2 >= self.n:
             self.blocks.a[r - 1] = None
             self.blocks.remove(r - 1)
             r -= 1
 
     def __str__(self):
-        import re
+        """Displays blocks with zombie values masked as None.
+
+        Keeps implementation faithful to pseudocode and optimized:
+        - Zombie values not cleared in remove() (left for natural overwrite)
+        - Same block lists reused (no new allocations on add)
+        - Output shows only visible elements within current n
+        """
+
         out = []
         out.append("\n=== Original RootishArrayStack ===")
         out.append(f"elements           : {self.n}")
         out.append(f"logical blocks     : {self.blocks.n}")
         out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
 
-        blocks = "\n".join(
-            [f"block {i:^3}: {block}" for i, block in enumerate(self.blocks.a)]
-        )
-        out.append(blocks)
+        for i in range(self.blocks.n):
+            block = self.blocks.get(i)
+            b_start = i * (i + 1) // 2
+            remaining_elements = max(0, self.n - b_start)
+            visible_count = min(len(block), remaining_elements)
+
+            display = block[:visible_count] + [None] * (len(block) - visible_count)
+            out.append(f"block {i:^3}: {display}")
+
         return "\n".join(out)

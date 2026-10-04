@@ -23,6 +23,11 @@ class BDeque:
         if self.n == self.capacity:
             raise Exception("Block full")
 
+        if self.n == 0:
+            self.a[self.j] = x
+            self.n +=1
+            return
+
         if i < self.n // 2:
             self.j = (self.j - 1) % self.capacity
             for k in range(i):
@@ -92,8 +97,6 @@ class BDeque:
     def __str__(self):
         return (
             f"a: {self.a}"
-            f" \nn: {self.n}, "
-            f" \nj: {self.j}, "
-            f"capacity: {self.capacity}"
+            f" \nn: {self.n}, j: {self.j}, capacity: {self.capacity}"
         )
 
