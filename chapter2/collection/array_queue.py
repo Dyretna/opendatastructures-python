@@ -33,3 +33,11 @@ class ArrayQeue:
             b[k] = self.a[(self.j + k) % len(self.a)]
         self.a = b
         self.j = 0
+
+
+    def __str__(self):
+        out = ["=== Array Queue ==="]
+        out.append(f"{self.a}")
+        out.append(f"n: {self.n}, j: {self.j}")
+
+        return "\n".join(out)

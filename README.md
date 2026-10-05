@@ -9,9 +9,8 @@ I start by testing Morin’s original pseudocode implementations in a Jupyter no
 | Chapter | Contents                                       |
 |---------|------------------------------------------------|
 | 1       | Introduction, notation, running time models    |
-| 2       | Array-Based Lists (Stack, Queue, Deque,        |
-|         | RandomQueue, RootishArrayStack)                |
-| 3       | Linked lists (Singly-Linked, Doubly-Linked)    |
+| 2       | Array-Based Lists                              |
+| 3       | Linked lists                                   |
 | 4       | Skiplists                                      |
 | 5       | Hash tables                                    |
 | 6       | Binary trees                                   |

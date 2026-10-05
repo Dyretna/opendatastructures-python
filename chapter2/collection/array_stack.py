@@ -89,3 +89,9 @@ class ArrayStack:
 
         self.n += m
 
+    def __str__(self):
+        out = ["=== Array Stack ==="]
+        out.append(f"{self.a}")
+        out.append(f"n: {self.n}")
+
+        return "\n".join(out)
