@@ -4,7 +4,7 @@ import copy
 class Node:
 
     def __init__(self, x:Any):
-        self.item = x
+        self.x = x
         self.next: Optional[Node] = None
 
 # ------------------------------------------
@@ -36,10 +36,21 @@ class SLList:
         self.head: Optional[Node] = None
         self.tail: Optional[Node] = None
 
-    # --------------------------------------
-    # Stack Operations - Constant time
-    # --------------------------------------
-    def push(self, x:Any):
+    def get(self, i:int):
+        head = self.head
+        self._validate_index(i)
+        head = self._traverse_steps(i)
+
+        return head.x
+
+    def set(self, i:int, x:Any) -> None:
+        head = self.head
+        self._validate_index(i)
+        head = self._traverse_steps(i)
+
+        head.x = x
+
+    def push(self, x:Any) -> Any:
         u = self._new_node(x)
         u.next = self.head
         self.head = u
@@ -50,27 +61,7 @@ class SLList:
         self.n += 1
         return x
 
-    def pop(self):
-        if self.n == 0:
-            return None
-        x = self.head.item
-
-        self.head = self.head.next
-        self.n -= 1
-
-        if self.n == 0:
-            self.tail = None
-
-        return x
-
-    # --------------------------------------
-    # Queue Operations (FIFO) - Constant time
-    # --------------------------------------
-
-    def remove(self):
-        return self.pop()
-
-    def add(self, x:Any):
+    def append(self, x:Any) -> bool:
         u = self._new_node(x)
         if self.n == 0:
             self.head = u
@@ -82,18 +73,110 @@ class SLList:
 
         return True
 
+    def add(self, i:int, x:Any) -> bool:
+        self._validate_index(i, adding=True)
+
+        if self.n == 0 or i == 0:
+            self.push(x)
+            return True
+
+        if i == self.n:
+            self.append(x)
+            return True
+
+        u = self._new_node(x)
+        head = self._traverse_steps(i-1)
+        u.next = head.next
+        head.next = u
+
+        self.n += 1
+        return True
+
+    def pop(self) -> Any:
+        if self.n == 0:
+            return None
+        x = self.head.x
+
+        self.head = self.head.next
+        self.n -= 1
+
+        if self.n == 0:
+            self.tail = None
+
+        return x
+
+    def remove(self, i:int) -> Any:
+        self._validate_index(i)
+        if self.n == 0:
+            raise IndexError("Linked List it empty")
+        elif i == 0:
+            return self.pop()
+        else:
+            head = self._traverse_steps(i-1)
+
+        x = head.next.x
+        head.next = head.next.next
+        self.n -= 1
+
+        return x
+
+    def reverse(self) -> None:
+        pass
+
+    def second_last(self) -> Any:
+        head = self.head
+
+        if head == None or head.next == None:
+            return None
+
+        while head.next.next is not None:
+            head = head.next
+
+        return head.x
+
+    def check_size(self):
+        head = self.head
+
+        i = 0
+        while head:
+            head = head.next
+            i += 1
+
+        if not i == self.n:
+            raise AssertionError("Size of n is not equal to number of Nodes")
+
+    
+
     # --------------------------------------
     # Internal Helpers
     # --------------------------------------
 
+    def _traverse_steps(self, i:int) -> Node:
+        head = self.head
+
+        for i in range(i):
+            head = head.next
+
+        return head
+
     def _new_node(self, x:Any):
         return Node(x)
+
+
+    def _validate_index(self, i:int, adding:bool=False):
+        if adding:
+            bounds = self.n
+        else:
+            bounds = self.n - 1
+
+        if not 0 <= i <= bounds:
+            raise IndexError(f"Out of bounds: i={i}. Stay in range: 0 - {bounds}")
 
     def _get_next_item(self):
         b = copy.deepcopy(self)
 
         while b.head:
-            yield b.head.item
+            yield str(b.head.x)
 
             b.head = b.head.next
 
@@ -103,8 +186,8 @@ class SLList:
         gen = self._get_next_item()
 
         head_str = f"HEAD: {next(gen)}"
-        nodes = [item for item in list(gen)]
+        nodes = [x for x in list(gen)]
         nodes_str = "node: " + "\nnode: ".join(nodes[:-1])
-        tail_str = f"TAIL: {nodes[-1]}"
+        tail_str = f"TAIL: {self.tail.x}"
 
-        return "\n".join([header, n, head_str, nodes_str, tail_str])
+        return "\n" + "\n".join([header, n, head_str, nodes_str, tail_str])
