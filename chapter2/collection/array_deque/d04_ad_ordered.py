@@ -1,5 +1,5 @@
-
 from typing import Any
+
 
 class ArrayDequeOrdered:
     """
@@ -15,12 +15,10 @@ class ArrayDequeOrdered:
 
     def __init__(self, min_capacity:int=8):
         self.min_capacity = min_capacity
-        self.capacity = self.min_capacity
-
-        # att init - they are inverted,
-        # since they step inside add before adding.
-        self.left_pointer = self.capacity // 2
-        self.right_pointer = (self.capacity // 2) - 1
+        self.capacity = None
+        self.block_start = None
+        self.block_end = None
+        self._initialize_block()
 
         self.a = [None] * self.capacity
         self.n = 0
@@ -34,28 +32,30 @@ class ArrayDequeOrdered:
         return self.n
 
     def add_left(self, x:Any):
-        if self.left_pointer -1 < 0:
+        if self.block_start -1 < 0:
             self.rebuild(self.capacity * 2)
-        self.left_pointer -= 1
-        self.a[self.left_pointer] = x
+        self.block_start -= 1
+        self.a[self.block_start] = x
         self.n += 1
 
     def add_right(self, x:Any):
-        if self.right_pointer +1 >= len(self.a) -1:
+        if self.block_end +1 >= len(self.a) -1:
             self.rebuild(self.capacity * 2)
-        self.right_pointer += 1
-        self.a[self.right_pointer] = x
+        self.block_end += 1
+        self.a[self.block_end] = x
         self.n += 1
 
     def pop_left(self) -> Any:
         if self.n == 0:
             raise IndexError("pop from empty deque")
-        val = self.a[self.left_pointer]
-        self.a[self.left_pointer] = None
-        self.left_pointer += 1
+        val = self.a[self.block_start]
+        self.a[self.block_start] = None
+        self.block_start += 1
         self.n -= 1
 
-        if self.size <= self.capacity // 3:
+        if self.size == 0:
+            self._initialize_block()
+        if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
             self.rebuild(self.capacity // 2)
 
         return val
@@ -63,12 +63,14 @@ class ArrayDequeOrdered:
     def pop_right(self) -> Any:
         if self.n == 0:
             raise IndexError("pop from empty deque")
-        val = self.a[self.left_pointer]
-        self.a[self.right_pointer] = None
-        self.right_pointer -= 1
+        val = self.a[self.block_start]
+        self.a[self.block_end] = None
+        self.block_end -= 1
         self.n -= 1
 
-        if self.size <= self.capacity // 3:
+        if self.size == 0:
+            self._initialize_block()
+        if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
             self.rebuild(self.capacity // 2)
 
         return val
@@ -76,14 +78,14 @@ class ArrayDequeOrdered:
     def rebuild(self, new_capacity:int):
         b = [None] * new_capacity
 
-        old_lp = self.left_pointer
-        old_rp = self.right_pointer
+        old_lp = self.block_start
+        old_rp = self.block_end
 
-        # we take a quarter of empty space before array start
-        self.left_pointer = (new_capacity // 4) + 1
-        self.right_pointer = self.left_pointer + self.n - 1
+        # we take a quarter of empty space before block start
+        self.block_start = (new_capacity // 4) + 1
+        self.block_end = self.block_start + self.n - 1
 
-        b[self.left_pointer:self.right_pointer + 1] = self.a[old_lp:old_rp + 1]
+        b[self.block_start:self.block_end + 1] = self.a[old_lp:old_rp + 1]
         self.a = b
         self.capacity = new_capacity
 
@@ -91,6 +93,12 @@ class ArrayDequeOrdered:
     # Internal Helpers
     # --------------------------------------------------------
 
+    def _initialize_block(self):
+        # att init - block start and end has to have an offset,
+        # since they step inside add before adding.
+        self.capacity = self.min_capacity
+        self.block_start = self.capacity // 2
+        self.block_end = (self.capacity // 2) - 1
 
     def __str__(self):
         return (
@@ -98,7 +106,7 @@ class ArrayDequeOrdered:
             f"\n{self.a}"
             f"\nCapacity       : {self.capacity}"
             f"\nSize           : {self.size}"
-            f"\nleft pointer   : {self.left_pointer}"
-            f"\nright pointer  : {self.right_pointer}"
+            f"\nBlock Start    : {self.block_start}"
+            f"\nBlock End      : {self.block_end}"
             "\n" + "-"*30
         )
