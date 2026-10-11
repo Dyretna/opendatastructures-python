@@ -11,7 +11,7 @@ class ArrayDeque:
         return self.a[(i + self.j) % len(self.a)]
 
     def set(self, i:int, x:Any):
-        y = copy.copy(self.a[(i + self.j) % len(self.a)])
+        y = self.a[(i + self.j) % len(self.a)]
         self.a[(i + self.j) % len(self.a)] = x
         return y
 

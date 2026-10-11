@@ -11,39 +11,38 @@ class ArrayDequeOrdered:
         |  <- add left    |  add right ->  |
         +-----------------+----------------+
 
-    This makes sure we reach the amortised time complexity
-    requirement. To speed up copying in rebuild, we will
-    check options in itertools or other python builtins,
-    but not 3rd party.
     """
 
-    def __init__(self, min_size:int=8):
-        self.min_size = min_size
-        self.size = self.min_size
+    def __init__(self, min_capacity:int=8):
+        self.min_capacity = min_capacity
+        self.capacity = self.min_capacity
 
-        self.middle = self.size >> 1
         # att init - they are inverted,
         # since they step inside add before adding.
-        self.left_pointer = self.middle
-        self.right_pointer = self.middle -1
+        self.left_pointer = self.capacity // 2
+        self.right_pointer = (self.capacity // 2) - 1
 
-        self.a = [None] * self.min_size
+        self.a = [None] * self.capacity
         self.n = 0
 
     # -----------------------------------------------------------
     # Public Methods
     # -----------------------------------------------------------
 
+    @ property
+    def size(self):
+        return self.n
+
     def add_left(self, x:Any):
         if self.left_pointer -1 < 0:
-            self.rebuild()
+            self.rebuild(self.capacity * 2)
         self.left_pointer -= 1
         self.a[self.left_pointer] = x
         self.n += 1
 
     def add_right(self, x:Any):
         if self.right_pointer +1 >= len(self.a) -1:
-            self.rebuild()
+            self.rebuild(self.capacity * 2)
         self.right_pointer += 1
         self.a[self.right_pointer] = x
         self.n += 1
@@ -55,6 +54,10 @@ class ArrayDequeOrdered:
         self.a[self.left_pointer] = None
         self.left_pointer += 1
         self.n -= 1
+
+        if self.size <= self.capacity // 3:
+            self.rebuild(self.capacity // 2)
+
         return val
 
     def pop_right(self) -> Any:
@@ -64,20 +67,25 @@ class ArrayDequeOrdered:
         self.a[self.right_pointer] = None
         self.right_pointer -= 1
         self.n -= 1
+
+        if self.size <= self.capacity // 3:
+            self.rebuild(self.capacity // 2)
+
         return val
 
-    def rebuild(self):
-        self.size <<= 1
-        b = [None] * self.size
+    def rebuild(self, new_capacity:int):
+        b = [None] * new_capacity
 
         old_lp = self.left_pointer
         old_rp = self.right_pointer
 
-        self.left_pointer = (self.size >> 2) + 1
+        # we take a quarter of empty space before array start
+        self.left_pointer = (new_capacity // 4) + 1
         self.right_pointer = self.left_pointer + self.n - 1
 
         b[self.left_pointer:self.right_pointer + 1] = self.a[old_lp:old_rp + 1]
         self.a = b
+        self.capacity = new_capacity
 
     # --------------------------------------------------------
     # Internal Helpers
@@ -88,10 +96,9 @@ class ArrayDequeOrdered:
         return (
             f"=== ArrayDequeOrdered ==="
             f"\n{self.a}"
-            f"\nDeque size     : {self.size}"
-            f"\nMiddle         : {self.middle}"
+            f"\nCapacity       : {self.capacity}"
+            f"\nSize           : {self.size}"
             f"\nleft pointer   : {self.left_pointer}"
             f"\nright pointer  : {self.right_pointer}"
-            f"\nn (elements)   : {self.n}"
             "\n" + "-"*30
         )
