@@ -121,7 +121,22 @@ class SLList:
         return x
 
     def reverse(self) -> None:
-        pass
+        current = self.head
+        prev = None
+
+        # traverse all nodes in SLL
+        while current is not None:
+            # store next
+            nxt = current.next
+
+            # reverese current nodes next pointer
+            current.next = prev
+
+            # move pointers one position ahead
+            prev = current
+            current = nxt
+
+        self.head, self.tail = self.tail, self.head
 
     def second_last(self) -> Any:
         head = self.head
@@ -145,7 +160,7 @@ class SLList:
         if not i == self.n:
             raise AssertionError("Size of n is not equal to number of Nodes")
 
-    
+
 
     # --------------------------------------
     # Internal Helpers
