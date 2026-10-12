@@ -17,8 +17,8 @@ class MinDeque:
 
         if self.size == 0:
             self.aux_deque.add_left(x)
-        elif x > self.aux_deque.get(0):
-            self.aux_deque.add_left(self.aux_deque.get(0))
+        elif x > self.aux_deque.a[self.aux_deque.block_start]:
+            self.aux_deque.add_left(self.aux_deque.a[self.aux_deque.block_start])
         else:
             self.aux_deque.add_left(x)
 
@@ -27,8 +27,8 @@ class MinDeque:
 
         if self.size == 0:
             self.aux_deque.add_right(x)
-        elif x > self.aux_deque.get(self.size - 1):
-            self.aux_deque.add_right(self.aux_deque.get(self.size - 1))
+        elif x > self.aux_deque.a[self.aux_deque.block_end]:
+            self.aux_deque.add_right(self.aux_deque.a[self.aux_deque.block_end])
         else:
             self.aux_deque.add_right(x)
 
@@ -42,20 +42,19 @@ class MinDeque:
         self.aux_deque.pop_right()
 
     def get_min(self):
-        first = self.aux_deque.get(0)
-        last = self.aux_deque.get(self.size - 1)
+        first = self.aux_deque.a[self.aux_deque.block_start]
+        last = self.aux_deque.a[self.aux_deque.block_end]
         if first <= last:
             return first
         else:
             return last
-
 
     # ------------------------------------------------------
     # internal helpers
     # ------------------------------------------------------
 
     def __str__(self):
-        out = [" MinQueue ".center(40, "=")]
+        out = [" MinDeque ".center(40, "=")]
         out.append(f"MainDeque: {self.main_deque.a}")
         out.append(f"AuxDeque: {self.aux_deque.a}")
         out.append(f"Size: {self.size}")

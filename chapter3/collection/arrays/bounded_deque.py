@@ -55,26 +55,26 @@ class BDeque:
         self.n -= 1
         return x
 
-    def add_left(self, x:Any):
+    def add_first(self, x:Any):
         if self.n == self.capacity:
             raise Exception("Block full")
         self.j = (self.j - 1) % self.capacity
         self.a[self.j] = x
         self.n += 1
 
-    def add_right(self, x:Any):
+    def add_last(self, x:Any):
         if self.n == self.capacity:
             raise Exception("Block full")
         self.a[(self.j + self.n) % self.capacity] = x
         self.n += 1
 
-    def pop_left(self):
+    def pop_first(self):
         x = self.a[self.j]
         self.j = (self.j + 1) % self.capacity
         self.n -= 1
         return x
 
-    def pop_right(self):
+    def pop_last(self):
         idx = (self.j + self.n - 1) % self.capacity
         x = self.a[idx]
         self.n -= 1

@@ -1,9 +1,6 @@
 from typing import Any, Optional
-import copy
 
-from .bounded_deque import BDeque
-
-
+from .arrays import BDeque
 
 class Node:
 
@@ -30,7 +27,7 @@ class SEList:
     add(i, x) and remove(i) operations results in a total of O(bm)
     time spent during all calls to spread(u) and gather(u).
 
-    The space (measured in words)1 used by an SEList that stores n
+    The space (measured in words) used by an SEList that stores n
     elements is n + O(b + n/b).
 
     """
@@ -56,7 +53,7 @@ class SEList:
         last = self.dummy.prev
         if last == self.dummy or last.d.size() == self.b + 1:
             last = self._add_before(self.dummy)
-        last.d.add_right(x)
+        last.d.add_last(x)
         self.n += 1
 
     def add(self, i:int, x:Any):
@@ -91,7 +88,7 @@ class SEList:
             w = self._add_before(w)
 
         while w != u: # work backwards, shifting as we go
-            w.d.add_left(w.prev.d.pop_right())
+            w.d.add_first(w.prev.d.pop_last())
             w = w.prev
 
         w.d.add(j, x)
@@ -118,7 +115,7 @@ class SEList:
 
         while (u.d.size() < self.b - 1 and
                u.next    != self.dummy):
-            u.d.add_right(u.next.d.pop_left())
+            u.d.add_last(u.next.d.pop_first())
             u = u.next
 
         if u.d.size() == 0:
@@ -172,14 +169,14 @@ class SEList:
         w = self._add_before(w)
         while w != u:
             while w.d.size() < self.b:
-                w.d.add_left(w.prev.d.pop_right())
+                w.d.add_first(w.prev.d.pop_last())
             w = w.prev
 
     def _gather(self, u:Node) -> None:
         w = u
         for _ in range(self.b - 2):
             while w.d.size() < self.b:
-                w.d.add_right(w.next.d.pop_left())
+                w.d.add_last(w.next.d.pop_first())
             w = w.next
         self._remove_node(w)
 
@@ -189,7 +186,7 @@ class SEList:
 
     def __str__(self):
         out = []
-        out.append("=== Space-Efficient Linked List ===")
+        out.append(" Space Efficient Linked List ".center(50, "="))
         out.append(f"n : {self.n}")
 
         u = self.dummy.next

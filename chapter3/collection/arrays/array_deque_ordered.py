@@ -82,7 +82,7 @@ class ArrayDequeOrdered:
         old_rp = self.block_end
 
         # we take a quarter of empty space before block start
-        self.block_start = (new_capacity // 4) + 1
+        self.block_start = (new_capacity // 2 - (self.size // 2) - 1)
         self.block_end = self.block_start + self.n - 1
 
         b[self.block_start:self.block_end + 1] = self.a[old_lp:old_rp + 1]
