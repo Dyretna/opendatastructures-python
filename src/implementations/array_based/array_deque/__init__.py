@@ -1,11 +1,13 @@
-from .d01_original_ad import ArrayDeque
-from .d02_original_ad_dual import DualArrayDeque
-from .d03_ad_no_mod import ArrayDequeNoMod
-from .d04_ad_ordered import ArrayDequeOrdered
+from .bounded import BoundedDeque
+from .dual_array import DualArrayDeque
+from .no_mod import NoModDeque
+from .ordered import OrderedDeque
+from .original import ArrayDeque
 
 __all__ = [
     "ArrayDeque",
     "DualArrayDeque",
-    "ArrayDequeNoMod",
-    "ArrayDequeOrdered",
+    "NoModDeque",
+    "OrderedDeque",
+    "BoundedDeque",
 ]

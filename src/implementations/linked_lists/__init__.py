@@ -1,4 +1,3 @@
-from .arrays import MinDeque, MinQueue, MinStack
 from .dllist import DLList
 from .seldeque import SELDeque
 from .selist import SEList

@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class ArrayQeue:
+class ArrayQueue:
     """
     We use modulus on the length of array, which makes it circular
     in order to simulate an infinite array. var 'j' keeps track of
@@ -12,6 +12,14 @@ class ArrayQeue:
         self.a = []  # simulates infinite array with mod (%)
         self.j = 0  # keeps track of next element to remove
         self.n = 0
+
+    def get(self, i: int):
+        return self.a[(i + self.j) % len(self.a)]
+
+    def set(self, i: int, x: Any):
+        y = self.a[(i + self.j) % len(self.a)]
+        self.a[(i + self.j) % len(self.a)] = x
+        return y
 
     def add(self, x: Any):
         if self.n + 1 > len(self.a):

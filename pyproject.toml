@@ -5,7 +5,7 @@ build-backend = "setuptools.build_meta"
 [project]
 name = "opendatastructures-python"
 version = "0.1.0"
-description = "Python implementations on Pat Morrins examples and exercises in 'Open Data Strctures'"
+description = "Python implementations on Pat Morrins examples and exercises in 'Open Data Structures'"
 readme = "README.md"
 requires-python = ">=3.10"
 license = {file = "LICENSE"}

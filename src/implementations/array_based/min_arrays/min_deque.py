@@ -1,12 +1,12 @@
 from typing import Any
 
-from .array_deque_ordered import ArrayDequeOrdered
+from ..array_deque import OrderedDeque
 
 
 class MinDeque:
     def __init__(self):
-        self.main_deque = ArrayDequeOrdered()
-        self.aux_deque = ArrayDequeOrdered()
+        self.main_deque = OrderedDeque()
+        self.aux_deque = OrderedDeque()
 
     @property
     def size(self):

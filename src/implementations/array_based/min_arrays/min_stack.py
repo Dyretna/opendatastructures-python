@@ -1,6 +1,6 @@
 from typing import Any
 
-from .array_stack import ArrayStack
+from ..array_stack import ArrayStack
 
 
 class MinStack:

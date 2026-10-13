@@ -4,7 +4,7 @@ from typing import Any
 from .array_deque import ArrayDeque
 
 
-class TreQueue:
+class Treque:
     def __init__(self):
         self.left = ArrayDeque()
         self.mid = ArrayDeque()

@@ -1,20 +1,35 @@
-from .array_deque import ArrayDeque, ArrayDequeNoMod, ArrayDequeOrdered, DualArrayDeque
-from .array_queue import ArrayQeue
+from .array_deque import (
+    ArrayDeque,
+    BoundedDeque,
+    DualArrayDeque,
+    NoModDeque,
+    OrderedDeque,
+)
+from .array_queue import ArrayQueue
 from .array_stack import ArrayStack
+from .min_arrays import MinDeque, MinQueue, MinStack
 from .random_queue import RandomQeue
 from .rootish_array_stack import FurtherImprovedRAS, ImprovedRAS, RootishArrayStack
-from .tre_queue import TreQueue
+from .treque import Treque
 
 __all__ = [
+    # array deques
     "ArrayDeque",
     "DualArrayDeque",
-    "ArrayDequeNoMod",
-    "ArrayDequeOrdered",
-    "ArrayQeue",
-    "ArrayStack",
-    "RandomQeue",
+    "NoModDeque",
+    "OrderedDeque",
+    "BoundedDeque",
+    # min arrays
+    "MinStack",
+    "MinQueue",
+    "MinDeque",
+    # ras
     "RootishArrayStack",
     "ImprovedRAS",
     "FurtherImprovedRAS",
-    "TreQueue",
+    # the rest
+    "ArrayQueue",
+    "ArrayStack",
+    "RandomQeue",
+    "Treque",
 ]

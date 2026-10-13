@@ -1,11 +1,11 @@
 from typing import Any, Optional
 
-from .arrays import BDeque
+from ..array_based import BoundedDeque
 
 
 class Node:
     def __init__(self, block_size: int):
-        self.d = BDeque(block_size + 1)
+        self.d = BoundedDeque(block_size + 1)
         self.prev: Optional[Node] = None
         self.next: Optional[Node] = None
 

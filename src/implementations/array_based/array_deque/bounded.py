@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 
-class BDeque:
+class BoundedDeque:
     def __init__(self, capacity: Optional[int] = 4):
         self.a = [None] * capacity
         self.capacity = capacity

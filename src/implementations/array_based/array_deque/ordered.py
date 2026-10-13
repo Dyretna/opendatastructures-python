@@ -1,7 +1,7 @@
 from typing import Any
 
 
-class ArrayDequeOrdered:
+class OrderedDeque:
     """
     We create an deque without a circular buffer, and
     instead add from middle towards both ends. when any end is
@@ -81,7 +81,7 @@ class ArrayDequeOrdered:
         old_lp = self.block_start
         old_rp = self.block_end
 
-        # we take a quarter of empty space before block start
+        # we take about a quarter of empty space before block start
         self.block_start = new_capacity // 2 - (self.size // 2) - 1
         self.block_end = self.block_start + self.n - 1
 

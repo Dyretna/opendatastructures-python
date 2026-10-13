@@ -1,4 +1,3 @@
-import copy
 from typing import Any
 
 
@@ -11,7 +10,7 @@ class ArrayStack:
         return self.a[i]
 
     def set(self, i: int, x: Any) -> Any:
-        y = copy.copy(self.a[i])
+        y = self.a[i]
         self.a[i] = x
         return y
 

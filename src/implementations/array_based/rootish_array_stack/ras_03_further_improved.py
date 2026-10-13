@@ -1,14 +1,14 @@
 from math import ceil, sqrt
 from typing import Any
 
+from ..array_deque import BoundedDeque
 from ..array_stack import ArrayStack
-from .bounded_deque import BDeque
 
 
 class FurtherImprovedRAS:
     def __init__(self):
         self.n = 0
-        self.blocks: ArrayStack[BDeque | None] = ArrayStack()
+        self.blocks: ArrayStack[BoundedDeque | None] = ArrayStack()
         self._initialize_first_block()  # insert bdeque with cap = 1
 
     def i2b(self, i: int):
@@ -29,8 +29,8 @@ class FurtherImprovedRAS:
 
     def append(self, x: Any):
         self._ensure_capacity()
-        block: BDeque = self.blocks.get(self.blocks.n - 1)
-        block.add_right(x)
+        block: BoundedDeque = self.blocks.get(self.blocks.n - 1)
+        block.add_last(x)
         self.n += 1
 
     def add(self, i: int, x: Any):
@@ -42,7 +42,7 @@ class FurtherImprovedRAS:
         self._ensure_capacity()
 
         b = self.i2b(i)
-        block: BDeque = self.blocks.get(b)
+        block: BoundedDeque = self.blocks.get(b)
 
         if block.size() == block.capacity:
             self._spread(b)
@@ -71,7 +71,7 @@ class FurtherImprovedRAS:
     # ---------------------------------------------------
 
     def _initialize_first_block(self):
-        self.blocks.a = [BDeque(capacity=1)]
+        self.blocks.a = [BoundedDeque(capacity=1)]
 
     def _ensure_capacity(self):
         """
@@ -86,19 +86,19 @@ class FurtherImprovedRAS:
     def _grow(self):
         # add a new block of size r+1 (filled with None)
         r = self.blocks.n
-        new_block = BDeque(capacity=r + 1)
+        new_block = BoundedDeque(capacity=r + 1)
         self.blocks.add(self.blocks.n, new_block)
 
     def _spread(self, b: int) -> None:
         for i in range(self.blocks.n - 1, b, -1):
-            source: BDeque = self.blocks.get(i - 1)
-            target: BDeque = self.blocks.get(i)
+            source: BoundedDeque = self.blocks.get(i - 1)
+            target: BoundedDeque = self.blocks.get(i)
 
             if source.size() == 0:
                 continue
 
             if target.size() < target.capacity:
-                target.add_left(source.pop_right())
+                target.add_first(source.pop_last())
             else:
                 # fallback if full
                 break

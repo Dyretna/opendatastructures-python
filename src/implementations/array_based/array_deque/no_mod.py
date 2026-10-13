@@ -2,7 +2,7 @@ import copy
 from typing import Any
 
 
-class ArrayDequeNoMod:
+class NoModDeque:
     def __init__(self):
         self.min_size = 4
         self.size = self.min_size
