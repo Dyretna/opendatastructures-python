@@ -1,0 +1,43 @@
+[build-system]
+requires = ["setuptools>=61.0", "wheel"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "opendatastructures-python"
+version = "0.1.0"
+description = "Python implementations on Pat Morrins examples and exercises in 'Open Data Strctures'"
+readme = "README.md"
+requires-python = ">=3.10"
+license = {file = "LICENSE"}
+authors = [
+    {name = "Jesper Anteryd", email = "jesper.anteryd@proton.me"},
+]
+keywords = ["computer science, data structures, python"]
+classifiers = [
+    "Development Status :: 3 - Alpha",
+    "Intended Audience :: End Users/Desktop",
+    "License :: OSI Approved :: MIT License",
+    "Programming Language :: Python :: 3",
+    "Programming Language :: Python :: 3.10",
+    "Topic :: Education, Computer Science, Data Structures"
+]
+dependencies = [
+    "numpy>=1.26.4",
+    "pandas>=2.3.1",
+    "matplotlib>=3.10.5",
+]
+
+[project.optional-dependencies]
+dev = [
+    "pytest>=9.0.1",
+    "pre_commit>=4.4.0",
+]
+
+[project.urls]
+Repository = "https://github.com/Dyretna/opendatastructures-python"
+
+[tool.setuptools]
+package-dir = {"" = "src"}
+
+[tool.setuptools.packages.find]
+where = ["src"]
