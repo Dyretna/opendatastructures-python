@@ -109,14 +109,14 @@ class FurtherImprovedRAS:
                 continue
 
             if target.size < target.capacity:
-                target.add_first(source.pop_last())
+                target.add_first(source.remove_last())
             else:
                 # fallback if full
                 break
 
     def _gather(self, b: int) -> None:
         for i in range(b, self.blocks.n - 1):
-            elem = self.blocks.get(i + 1).pop_first()
+            elem = self.blocks.get(i + 1).remove_first()
             self.blocks.get(i).add_last(elem)
         self._shrink()
 
