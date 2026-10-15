@@ -36,12 +36,11 @@ class ArrayDequeBase(ABC):
     def remove_last(self):
         return self.remove(self.size - 1)
 
-    def _get_mod_idx(self, i: int):
-        return (i + self.j) % len(self.a)
-
     # --------------------------------------------------------
     # implemented in childclass
     # --------------------------------------------------------
+
+    def _get_mod_idx(i: int): ...
 
     @abstractmethod
     def add(self, i: int, x: Any): ...
