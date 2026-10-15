@@ -5,6 +5,17 @@ from ..array_stack import ArrayStack
 
 
 class ImprovedRAS:
+    """
+    An implementation of a RootishArrayStack that:
+    has only O(√n) wasted space, but that can perform
+    add(i, x) and remove(i, x) operations in
+
+        *O(1 + min{i , n - i})*
+
+    time.
+
+    """
+
     def __init__(self):
         self.n = 0
         self.blocks = ArrayStack()
@@ -21,7 +32,6 @@ class ImprovedRAS:
     def set(self, i: int, x: Any):
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
-        # return a shallow copy of the old value, then replace it
         old = self.blocks.get(b)[j]
         self.blocks.get(b)[j] = x
         return old
@@ -30,6 +40,7 @@ class ImprovedRAS:
         # ensure there is room for one more element:
         # while total capacity < n+1, grow
         r = self.blocks.n
+
         while r * (r + 1) // 2 < self.n + 1:
             self._grow()
             r = self.blocks.n
@@ -67,7 +78,7 @@ class ImprovedRAS:
         return x
 
     # ---------------------------------------------------
-    # internal helpers - grow, shrink
+    # internal helpers
     # ---------------------------------------------------
 
     def _grow(self):
@@ -78,8 +89,6 @@ class ImprovedRAS:
         self.blocks.add(self.blocks.n, new_block)
 
     def _shrink(self):
-        # optional separate shrink method:
-        # remove trailing blocks while capacity is excessive
         r = self.blocks.n
 
         while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:

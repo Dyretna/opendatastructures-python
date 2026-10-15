@@ -124,8 +124,8 @@ class Treque:
         # just a helper to get an ordered 'pretty print' for debugging
         ordered_c = []
         for block in [self.left, self.mid, self.right]:
-            for k in range(block.n):
-                ordered_c.extend(block.a[(block.j + k) % len(block.a)])
+            for k in range(block.size):
+                ordered_c.append(block.a[(block.j + k) % len(block.a)])
 
         return ordered_c
 

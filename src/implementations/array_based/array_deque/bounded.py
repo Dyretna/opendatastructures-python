@@ -1,97 +1,46 @@
 from typing import Any, Optional
 
+from .original_with_additions import ArrayDeque
 
-class BoundedDeque:
+
+class BoundedDeque(ArrayDeque):
     def __init__(self, capacity: Optional[int] = 4):
         self.a = [None] * capacity
-        self.capacity = capacity
         self.j = 0
         self.n = 0
 
-    def size(self):
-        return self.n
+    # ---------------------------------
+    # Additional public properties and methods
+    # ---------------------------------
 
-    def get(self, i: int):
-        return self.a[self._get_idx(i)]
-
-    def set(self, i: int, x: Any):
-        old = self.a[self._get_idx(i)]
-        self.a[self._get_idx(i)] = x
-        return old
+    @property
+    def capacity(self):
+        return len(self.a)
 
     def add(self, i: int, x: Any):
-        if self.n == self.capacity:
+        if self.size == self.capacity:
             raise Exception("Block full")
 
-        if self.n == 0:
+        if self.size == 0:
             self.a[self.j] = x
             self.n += 1
             return
 
-        if i < self.n // 2:
-            self.j = (self.j - 1) % self.capacity
+        if i < self.size // 2:
+            self.j = self._get_mod_idx(-1)
             for k in range(i):
                 self._shift_section_left(k)
         else:
-            for k in range(self.n, i, -1):
+            for k in range(self.size, i, -1):
                 self._shift_section_right(k)
 
-        self.a[self._get_idx(i)] = x
+        self.a[self._get_mod_idx(i)] = x
         self.n += 1
-
-    def remove(self, i: int):
-        x = self.a[self._get_idx(i)]
-
-        if i < self.n // 2:
-            for k in range(i, 0, -1):
-                self._shift_section_right(k)
-            self.a[self._get_idx(0)] = None
-            self.j = (self.j + 1) % self.capacity
-        else:
-            for k in range(i, self.n - 1):
-                self._shift_section_left(k)
-            self.a[self._get_idx(self.n - 1)] = None
-
-        self.n -= 1
-        return x
-
-    def add_first(self, x: Any):
-        if self.n == self.capacity:
-            raise Exception("Block full")
-        self.j = (self.j - 1) % self.capacity
-        self.a[self.j] = x
-        self.n += 1
-
-    def add_last(self, x: Any):
-        if self.n == self.capacity:
-            raise Exception("Block full")
-        self.a[(self.j + self.n) % self.capacity] = x
-        self.n += 1
-
-    def pop_first(self):
-        x = self.a[self.j]
-        self.j = (self.j + 1) % self.capacity
-        self.n -= 1
-        return x
-
-    def pop_last(self):
-        idx = (self.j + self.n - 1) % self.capacity
-        x = self.a[idx]
-        self.n -= 1
-        return x
-
-    # --------------------------------------------------------
-    # Internal Helpers
-    # --------------------------------------------------------
-
-    def _get_idx(self, i: int):
-        return (self.j + i) % self.capacity
-
-    def _shift_section_left(self, i: int):
-        self.a[self._get_idx(i)] = self.a[self._get_idx(i + 1)]
-
-    def _shift_section_right(self, i: int):
-        self.a[self._get_idx(i)] = self.a[self._get_idx(i - 1)]
 
     def __str__(self):
-        return f"a: {self.a} \nn: {self.n}, j: {self.j}, capacity: {self.capacity}"
+        out = [f" {__class__.__name__} ".center(50, "=")]
+        out.append(f"a: {self.a}")
+        out.append(f"j: {self.j}")
+        out.append(f"size: {self.size}")
+        out.append(f"capacity: {self.capacity}")
+        return "\n".join(out)

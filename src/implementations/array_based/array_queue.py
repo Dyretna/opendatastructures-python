@@ -13,6 +13,14 @@ class ArrayQueue:
         self.j = 0  # keeps track of next element to remove
         self.n = 0
 
+    # ---------------------------------
+    # Abstract interface requirements
+    # ---------------------------------
+
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i: int):
         return self.a[(i + self.j) % len(self.a)]
 
@@ -23,7 +31,7 @@ class ArrayQueue:
 
     def add(self, x: Any):
         if self.n + 1 > len(self.a):
-            self.resize()
+            self._resize()
         self.a[(self.j + self.n) % len(self.a)] = x
         self.n += 1
         return True
@@ -34,10 +42,14 @@ class ArrayQueue:
         self.n -= 1
         self.a[self.j - 1] = None
         if len(self.a) >= 3 * self.n:
-            self.resize()
+            self._resize()
         return x
 
-    def resize(self):
+    # ---------------------------------
+    # internal helpers
+    # ---------------------------------
+
+    def _resize(self):
         b = [None] * max(1, 2 * self.n)
         for k in range(self.n):
             b[k] = self.a[(self.j + k) % len(self.a)]
@@ -45,7 +57,7 @@ class ArrayQueue:
         self.j = 0
 
     def __str__(self):
-        out = ["=== Array Queue ==="]
+        out = [f" {__class__.__name__} ".center(50, "=")]
         out.append(f"{self.a}")
         out.append(f"n: {self.n}, j: {self.j}")
 

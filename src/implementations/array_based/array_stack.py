@@ -6,6 +6,14 @@ class ArrayStack:
         self.a = []
         self.n = 0
 
+    # ---------------------------------
+    # Abstract interface requirements
+    # ---------------------------------
+
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i: int):
         return self.a[i]
 
@@ -14,9 +22,19 @@ class ArrayStack:
         self.a[i] = x
         return y
 
+    def push(self, x: Any):
+        self.add(self.size, x)
+
+    def pop(self):
+        return self.remove(self.n - 1)
+
+    # ---------------------------------
+    # Additional public methods
+    # ---------------------------------
+
     def add(self, i: int, x: Any):
         if self.n == len(self.a):
-            self.resize()
+            self._resize()
 
         # shift right: go backwards
         for j in range(self.n, i, -1):
@@ -38,20 +56,12 @@ class ArrayStack:
         self.n -= 1
 
         if len(self.a) >= 3 * self.n:
-            self.resize()
+            self._resize()
 
         return x
 
-    def resize(self):
-        # ensure at least size 1
-        new_capacity = max(1, 2 * self.n)
-        b = [None] * new_capacity
-        for i in range(self.n):
-            b[i] = self.a[i]
-
-        self.a = b
-
     def add_all(self, i: int, c: list):
+        """inserts elements of an iterable in order at index."""
         m = len(c)
         if m == 0:
             return
@@ -88,8 +98,21 @@ class ArrayStack:
 
         self.n += m
 
+    # ---------------------------------
+    # internal helpers
+    # ---------------------------------
+
+    def _resize(self):
+        # ensure at least size 1
+        new_capacity = max(1, 2 * self.n)
+        b = [None] * new_capacity
+        for i in range(self.n):
+            b[i] = self.a[i]
+
+        self.a = b
+
     def __str__(self):
-        out = ["=== Array Stack ==="]
+        out = [f" {__class__.__name__} ".center(50, "=")]
         out.append(f"{self.a}")
         out.append(f"n: {self.n}")
 

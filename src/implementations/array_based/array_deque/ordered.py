@@ -7,9 +7,6 @@ class OrderedDeque:
     instead add from middle towards both ends. when any end is
     reached, we call rebuild() to create a new deque.
 
-        +-----------------+----------------+
-        |  <- add left    |  add right ->  |
-        +-----------------+----------------+
 
     """
 
@@ -23,29 +20,29 @@ class OrderedDeque:
         self.a = [None] * self.capacity
         self.n = 0
 
-    # -----------------------------------------------------------
-    # Public Methods
-    # -----------------------------------------------------------
+    # --------------------------------------------------------
+    # Abstract interface requirements
+    # --------------------------------------------------------
 
     @property
     def size(self):
         return self.n
 
-    def add_left(self, x: Any):
+    def add_first(self, x: Any):
         if self.block_start - 1 < 0:
-            self.rebuild(self.capacity * 2)
+            self._rebuild(self.capacity * 2)
         self.block_start -= 1
         self.a[self.block_start] = x
         self.n += 1
 
-    def add_right(self, x: Any):
+    def add_last(self, x: Any):
         if self.block_end + 1 >= len(self.a) - 1:
-            self.rebuild(self.capacity * 2)
+            self._rebuild(self.capacity * 2)
         self.block_end += 1
         self.a[self.block_end] = x
         self.n += 1
 
-    def pop_left(self) -> Any:
+    def remove_first(self) -> Any:
         if self.n == 0:
             raise IndexError("pop from empty deque")
         val = self.a[self.block_start]
@@ -56,11 +53,11 @@ class OrderedDeque:
         if self.size == 0:
             self._initialize_block()
         if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
-            self.rebuild(self.capacity // 2)
+            self._rebuild(self.capacity // 2)
 
         return val
 
-    def pop_right(self) -> Any:
+    def remove_last(self) -> Any:
         if self.n == 0:
             raise IndexError("pop from empty deque")
         val = self.a[self.block_start]
@@ -71,11 +68,23 @@ class OrderedDeque:
         if self.size == 0:
             self._initialize_block()
         if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
-            self.rebuild(self.capacity // 2)
+            self._rebuild(self.capacity // 2)
 
         return val
 
-    def rebuild(self, new_capacity: int):
+    # --------------------------------------------------------
+    # Additional public properties and methods
+    # --------------------------------------------------------
+
+    @property
+    def capacity(self):
+        return len(self.a)
+
+    # --------------------------------------------------------
+    # Internal Helpers
+    # --------------------------------------------------------
+
+    def _rebuild(self, new_capacity: int):
         b = [None] * new_capacity
 
         old_lp = self.block_start
@@ -88,10 +97,6 @@ class OrderedDeque:
         b[self.block_start : self.block_end + 1] = self.a[old_lp : old_rp + 1]
         self.a = b
         self.capacity = new_capacity
-
-    # --------------------------------------------------------
-    # Internal Helpers
-    # --------------------------------------------------------
 
     def _initialize_block(self):
         # att init - block start and end has to have an offset,

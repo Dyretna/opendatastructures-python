@@ -5,7 +5,18 @@ from ..array_deque import BoundedDeque
 from ..array_stack import ArrayStack
 
 
-class FurtherImprovedRAS:
+class EvenFurtherImprovedRAS:
+    """
+    An implementation of a RootishArrayStack that:
+    has only O(√n) wasted space, but that can perform
+    add(i, x) and remove(i, x) operations in
+
+        *O(1 + min{i, √n, n - i})*
+
+    time.
+
+    """
+
     def __init__(self):
         self.n = 0
         self.blocks: ArrayStack[BoundedDeque | None] = ArrayStack()
@@ -44,10 +55,10 @@ class FurtherImprovedRAS:
         b = self.i2b(i)
         block: BoundedDeque = self.blocks.get(b)
 
-        if block.size() == block.capacity:
+        if block.size == block.capacity:
             self._spread(b)
 
-        if block.size() == block.capacity:
+        if block.size == block.capacity:
             self._grow()
 
         j = i - b * (b + 1) // 2
@@ -69,6 +80,28 @@ class FurtherImprovedRAS:
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
+
+    # --- adders ---
+    def _add_from_left(self, i: int):
+        pass
+
+    def _add_from_middle(self):
+        pass
+
+    def _add_from_right(self):
+        pass
+
+    # --- removers ---
+    def _remove_from_left(self):
+        pass
+
+    def _remove_from_middle(self):
+        pass
+
+    def _remove_from_right(self):
+        pass
+
+    # ----------------------------------------------------
 
     def _initialize_first_block(self):
         self.blocks.a = [BoundedDeque(capacity=1)]
@@ -94,10 +127,10 @@ class FurtherImprovedRAS:
             source: BoundedDeque = self.blocks.get(i - 1)
             target: BoundedDeque = self.blocks.get(i)
 
-            if source.size() == 0:
+            if source.size == 0:
                 continue
 
-            if target.size() < target.capacity:
+            if target.size < target.capacity:
                 target.add_first(source.pop_last())
             else:
                 # fallback if full
@@ -142,7 +175,7 @@ class FurtherImprovedRAS:
             block = self.blocks.get(i)
             b_start = i * (i + 1) // 2
             remaining_elements = max(0, self.n - b_start)
-            visible_count = min(block.size(), remaining_elements)
+            visible_count = min(block.size, remaining_elements)
 
             display = [block.get(j) for j in range(visible_count)]
             display += [None] * (block.capacity - visible_count)
