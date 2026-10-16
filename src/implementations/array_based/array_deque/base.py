@@ -4,25 +4,17 @@ from typing import Any
 
 class ArrayDequeBase(ABC):
     def __init__(self):
-        self.a = []
+        self.a = [None]
         self.n = 0
         self.j = 0
 
-    # ---------------------------------
+    # ----------------------------------------------
     # Abstract interface requirements
-    # ---------------------------------
+    # ----------------------------------------------
 
     @property
     def size(self):
         return self.n
-
-    def get(self, i: int):
-        return self.a[self._get_mod_idx(i)]
-
-    def set(self, i: int, x: Any):
-        y = self.a[self._get_mod_idx(i)]
-        self.a[self._get_mod_idx(i)] = x
-        return y
 
     def add_first(self, x: Any):
         self.add(0, x)
@@ -36,11 +28,15 @@ class ArrayDequeBase(ABC):
     def remove_last(self):
         return self.remove(self.size - 1)
 
-    # --------------------------------------------------------
-    # implemented in childclass
-    # --------------------------------------------------------
+    # ----------------------------------------------
+    # implemented in childclass - get and set
+    # operations might use modular arithmetic in some
+    # cases, and XOR operations in others
+    # ----------------------------------------------
 
-    def _get_mod_idx(i: int): ...
+    def get(self, i: int): ...
+
+    def set(self, i: int, x: Any): ...
 
     @abstractmethod
     def add(self, i: int, x: Any): ...

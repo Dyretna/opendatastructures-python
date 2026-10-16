@@ -1,4 +1,3 @@
-from math import ceil
 from typing import Any
 
 from .array_deque import ArrayDeque
@@ -6,139 +5,93 @@ from .array_deque import ArrayDeque
 
 class Treque:
     def __init__(self):
-        self.left = ArrayDeque()
-        self.mid = ArrayDeque()
-        self.right = ArrayDeque()
+        self.front = ArrayDeque()
+        self.back = ArrayDeque()
 
-    def set(self, i: int, x: Any) -> None:
-        block, idx = self._get_block_and_idx(i)
-        block.set(idx, x)
+    # --------------------------------------------------------------
+    # Deque interface operations
+    # --------------------------------------------------------------
+
+    @property
+    def size(self):
+        return self.front.n + self.back.n
 
     def get(self, i: int) -> Any:
-        block, idx = self._get_block_and_idx(i)
-        return block.get(idx)
+        if i < self.front.size:
+            return self.front.get(i)
+        else:
+            return self.back.get(i - self.front.size)
+
+    def set(self, i: int, x: Any) -> None:
+        if i < self.front.size:
+            return self.front.set(i, x)
+        else:
+            return self.back.set(i - self.front.size, x)
+
+    def add_first(self, x: Any):
+        self.add(0, x)
+
+    def add_last(self, x: Any):
+        self.add(self.size, x)
+
+    def remove_first(self):
+        self.remove(0)
+
+    def remove_last(self):
+        self.remove(self.size)
+
+    # --------------------------------------------------------------
+    # other public methods - with indexing etc...
+    # --------------------------------------------------------------
 
     def add(self, i: int, x: Any) -> None:
-        block, idx = self._get_block_and_idx(i, adding=True)
-        block.add(idx, x)
-        if self._needs_balance():
-            self.balance()
+        self._balance()
+        if i < self.front.size:
+            self.front.add(i, x)
+        else:
+            self.back.add(i - self.front.size, x)
 
     def remove(self, i: int) -> Any:
-        block, idx = self._get_block_and_idx(i)
-        x = block.remove(idx)
-        if self._needs_balance():
-            self.balance()
-        return x
-
-    def balance(self):
-        """
-        Balances the deques if _needs_balance() has passed,
-        which ensures amortized O(1) time.
-
-        As is hinted at by Morin, if we would simply
-        initialize new ArrayDeques and use .add(i, x)
-        that would cause a lot of calls to resize().
-
-        Therefore, by initializing temporary lists,
-        and storing elements with .get(i) while iterating,
-        then using add_all() on new deques, only one call
-        to resize() is needed.
-        """
-        n = self.left.n + self.mid.n + self.right.n
-        third = ceil(n * 0.33)
-
-        temp1 = [None] * third
-        temp2 = [None] * third
-        temp3 = [None] * (n - third * 2)
-
-        for i in range(n):
-            if i < third:
-                temp1[i] = self.get(i)
-            elif i < third * 2:
-                temp2[i - third] = self.get(i)
-            else:
-                temp3[i - third * 2] = self.get(i)
-
-        self.left = ArrayDeque()
-        self.mid = ArrayDeque()
-        self.right = ArrayDeque()
-
-        self.left.add_all(0, temp1)
-        self.mid.add_all(0, temp2)
-        self.right.add_all(0, temp3)
-
-    def rotate_left(self, r):
-        pass
-
-    def rotate_right(self, r):
-        pass
+        self._balance()
+        if i < self.front.size:
+            self.front.add(i)
+        else:
+            self.back.add(i - self.front.size)
 
     # --------------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------------
 
-    def _get_block_and_idx(self, i, adding: bool = False):
-        self._validate_i(i, adding=adding)
-        if not all([self.left.n, self.mid.n, self.right.n]):
-            if not self.left.n:
-                return self.left, i
-            elif not self.mid.n:
-                return self.mid, i
-            else:
-                return self.right, i
+    def _balance(self):
+        mid = self.size // 2
+        if self.front.size >= self.back.size * 3:
+            while self.back.size < mid:
+                self.back.add_first(self.front.remove_last())
 
-        if i <= self.left.n - 1:
-            return self.left, i
-        elif i <= self.left.n + self.mid.n - 1:
-            return self.mid, i - self.left.n
-        else:
-            return self.right, i - (self.left.n + self.mid.n)
+        elif self.back.size >= self.front.size * 3:
+            while self.front.size < mid:
+                self.front.add_last(self.back.remove_first())
 
-    def _validate_i(self, i: int, adding: bool = False):
-        i_end = (self.left.n + self.mid.n + self.right.n) - 1
-        if adding:
-            i_end += 1
-        if i_end < 0:
-            raise ValueError("Container has no values!")
-        if not 0 <= i <= i_end:
-            raise IndexError(f"Index must be in range: 0 - {i_end}, got {i}")
+    def _rotate_left(self, r: int):
+        pass
 
-    def _needs_balance(self) -> bool:
-        """
-        Decides WHEN balancing should occur.
+    def _rotate_right(self, r: int):
+        pass
 
-        Triggers rebalancing when one segment
-        grows to large relative to others.
-            biggest >= 3 * smallest
+    def __lshift__(self, r: int):
+        self._rotate_left(r)
 
-        This threshold follows Morin's lazy-check pattern.
-        It ensures amortized 0(1) per add/remove by limiting
-        rebalance frequency.
-        """
-        biggest = max([self.left.n, self.mid.n, self.right.n])
-        smallest = min([self.left.n, self.mid.n, self.right.n])
-        return biggest >= max([3, smallest * 3])
-
-    def _get_ordered_collection(self):
-        # just a helper to get an ordered 'pretty print' for debugging
-        ordered_c = []
-        for block in [self.left, self.mid, self.right]:
-            for k in range(block.size):
-                ordered_c.append(block.a[(block.j + k) % len(block.a)])
-
-        return ordered_c
-
-    def __lshift__(self, r):
-        self.rotate_left(r)
-
-    def __rshift__(self, r):
-        self.rotate_right(r)
+    def __rshift__(self, r: int):
+        self._rotate_right(r)
 
     def __str__(self):
-        arr_strings = [self.left.__str__(), self.mid.__str__(), self.right.__str__()]
-        return (
-            f"Ordered: {self._get_ordered_collection()}\n"
-            + "Deques:\n"
-            + "\n".join(arr_strings)
-        )
+        out = [f" {__class__.__name__} ".center(50, "=")]
+        ordered = [self.get(i) for i in range(self.size)]
+        out.append(f"front      : {self.front.a}")
+        out.append(f"back       : {self.back.a}")
+        out.append(f"ordered    : {ordered}")
+        out.append("-" * 50)
+        out.append(f"size front : {self.front.size}")
+        out.append(f"size back  : {self.back.size}")
+        out.append(f"total size : {self.size}")
+        return "\n" + "\n".join(out)

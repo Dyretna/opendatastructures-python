@@ -4,82 +4,112 @@ from .base import ArrayDequeBase
 
 
 class ArrayDeque(ArrayDequeBase):
+    # ------------------------------------------------------
+    # Abstract interface requirements
+    # - add_first(), add_last(), remove_first(), remove_last()
+    # in parent class
+    # ------------------------------------------------------
+
+    def get(self, i: int):
+        self._index_bounds_check(i)
+        return self.a[(self.j + i) % len(self.a)]
+
+    def set(self, i: int, x: Any):
+        self._index_bounds_check(i)
+        y = self.a[(self.j + i) % len(self.a)]
+        self.a[(self.j + i) % len(self.a)] = x
+        return y
+
+    # ------------------------------------------------------
+    # additional Deque operations - indexing, rotation, etc..
+    # -----------------------------------------------------
+
     @property
     def capacity(self):
         return len(self.a)
 
     def add(self, i: int, x: Any):
+        self._index_bounds_check_adding(i)
+
         if self.n == self.capacity:
-            self._resize()
+            self._resize_grow()
 
         if i < self.size / 2:
-            self.j = self._get_mod_idx(-1)
+            self.j = (self.j - 1) % self.capacity
             for k in range(i):
                 self._shift_section_left(k)
         else:
             for k in range(self.n, i, -1):
                 self._shift_section_right(k)
 
-        self.a[self._get_mod_idx(i)] = x
+        self.a[(self.j + i) % self.capacity] = x
         self.n += 1
 
     def add_all(self, i: int, c: list):
         """inserts elements of an iterable in order at index."""
+        self._index_bounds_check_adding(i)
+
         m = len(c)
         if m == 0:
             return
 
         # ensure capacity
-        new_capacity = max(1, self.capacity)
-        if self.n + m > new_capacity:
-            while self.n + m > new_capacity:
+        if self.n + m > self.capacity:
+            new_capacity = self.capacity
+            while new_capacity < self.n + m:
                 new_capacity *= 2
 
             b = [None] * new_capacity
 
-            # copy left part
-            for j in range(i):
-                b[j] = self.a[j]
+            # Left side
+            for k in range(i):
+                b[k] = self.a[(self.j + k) % self.capacity]
 
-            # copy c
-            for j in range(m):
-                b[i + j] = c[j]
+            # insertion
+            for k in range(m):
+                b[i + k] = c[k]
 
-            # copy right part
-            for j in range(i, self.size):
-                b[j + m] = self.a[j]
+            # Right side
+            for k in range(i, self.size):
+                b[k + m] = self.a[(self.j + k) % self.capacity]
 
             self.a = b
+            self.j = 0
             self.n += m
             return
 
-        # enough space: rotate right
+        # enough space: shift right
         for k in range(self.size, i, -1):
             self._shift_section_right(k)
 
-        # insert c
+        # insert valies
         for j in range(m):
             self.a[i + j] = c[j]
 
         self.n += m
 
     def remove(self, i: int):
-        x = self.a[self._get_mod_idx(i)]
+        self._index_bounds_check(i)
+
+        x = self.a[(self.j + i) % self.capacity]
 
         if i < self.n / 2:
             # left-side
             for r in range(i, 0, -1):
                 self._shift_section_right(r)
+
             self.a[self.j] = None
-            self.j = self._get_mod_idx(1)
+            self.j = (self.j + 1) % self.capacity
         else:
             # right-side
             for k in range(i, self.size - 1):
                 self._shift_section_left(k)
 
+            self.a[(self.j + self.n - 1) % self.capacity] = None
+
         self.n -= 1
-        if self.size <= self.capacity // 3:
-            self._resize()
+        if self.capacity > 4 and self.capacity >= 3 * self.size:
+            self._resize_shrink()
 
         return x
 
@@ -97,41 +127,75 @@ class ArrayDeque(ArrayDequeBase):
     # Internal Helpers
     # --------------------------------------------------------
 
-    def _get_mod_idx(self, i: int) -> int:
-        return (i + self.j) % len(self.a)
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
 
-    def _shift_section_left(self, i: int) -> None:
-        self.a[self._get_mod_idx(i)] = self.a[self._get_mod_idx(i + 1)]
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
 
-    def _shift_section_right(self, i: int) -> None:
-        self.a[self._get_mod_idx(i)] = self.a[self._get_mod_idx(i - 1)]
+    def _resize_grow(self):
+        new_capacity = len(self.a) * 2
+        self._set_new_array(new_capacity)
 
-    def _resize(self) -> None:
-        b = [None] * max(1, 2 * self.capacity)
-        for k in range(self.n):
-            b[k] = self.get(self._get_mod_idx(k))
+    def _resize_shrink(self):
+        if self.capacity == 4:
+            return
+        else:
+            new_capacity = len(self.a) // 2
+        self._set_new_array(new_capacity)
+
+    def _set_new_array(self, new_capacity: int):
+        b = [None] * new_capacity
+        for k in range(self.size):
+            b[k] = self.a[(self.j + k) % self.capacity]
         self.a = b
         self.j = 0
 
+    def _shift_section_left(self, i: int) -> None:
+        self.a[(self.j + i) % len(self.a)] = self.a[(self.j + i + 1) % len(self.a)]
+
+    def _shift_section_right(self, i: int) -> None:
+        self.a[(self.j + i) % len(self.a)] = self.a[(self.j + i - 1) % len(self.a)]
+
+    # --- Rotating ---
     def _rotate_left(self, r: int) -> None:
-        r %= self.capacity
+        if self.n <= 1:
+            return
+
+        r %= self.size
 
         for _ in range(r):
-            first = self.a[0]
-            for j in range(0, self.capacity - 1):
-                self.a[j] = self.a[j + 1]
-            self.a[-1] = first
-            self.j = self._get_mod_idx(-1)
+            first = self.a[self.j]
+
+            # shift logical elements left (not empty slots)
+            for k in range(self.size - 1):
+                dst = (self.j + k) % self.capacity
+                src = (self.j + k + 1) % self.capacity
+                self.a[dst] = self.a[src]
+
+            # write first at logical end
+            last = (self.j + self.size - 1) % self.capacity
+            self.a[last] = first
 
     def _rotate_right(self, r: int) -> None:
-        r %= self.capacity
+        if self.size <= 1:
+            return
+
+        r %= self.size
 
         for _ in range(r):
-            last = self.a[self.capacity - 1]
-            for j in range(self.capacity - 1, 0, -1):
-                self.a[j] = self.a[j - 1]
-            self.a[0] = last
-            self.j = self._get_mod_idx(1)
+            last = self.a[(self.j + self.size - 1) % self.capacity]
+
+            # shift logical elements right
+            for k in range(self.size - 1, 0, -1):
+                dst = (self.j + k) % self.capacity
+                src = (self.j + k - 1) % self.capacity
+                self.a[dst] = self.a[src]
+
+            # write last to first
+            self.a[self.j] = last
 
     def __lshift__(self, r: int):
         self._rotate_left(r)
@@ -140,5 +204,8 @@ class ArrayDeque(ArrayDequeBase):
         self._rotate_right(r)
 
     def __str__(self):
-        header = f" {__class__.__name__} ".center(50, "=")
-        return header + "\n" + f"a: {self.a} \nn: {self.n}  j: {self.j}"
+        out = [f" {__class__.__name__} ".center(50, "=")]
+        out.append(f"a : {self.a}")
+        out.append(f"j : {self.j}")
+        out.append(f"size : {self.size}")
+        return "\n" + "\n".join(out)

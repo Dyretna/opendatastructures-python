@@ -40,7 +40,7 @@ class FurtherImprovedRAS:
 
     def append(self, x: Any):
         self._ensure_capacity()
-        block: BoundedDeque = self.blocks.get(self.blocks.n - 1)
+        block: BoundedDeque = self.blocks.get(self.blocks.size - 1)
         block.add_last(x)
         self.n += 1
 
@@ -89,19 +89,19 @@ class FurtherImprovedRAS:
         Ensure there is room for one more element:
         while total capacity < n+1, grow
         """
-        r = self.blocks.n
+        r = self.blocks.size
         while r * (r + 1) // 2 < self.n + 1:
             self._grow()
-            r = self.blocks.n
+            r = self.blocks.size
 
     def _grow(self):
         # add a new block of size r+1 (filled with None)
-        r = self.blocks.n
+        r = self.blocks.size
         new_block = BoundedDeque(capacity=r + 1)
-        self.blocks.add(self.blocks.n, new_block)
+        self.blocks.add(self.blocks.size, new_block)
 
     def _spread(self, b: int) -> None:
-        for i in range(self.blocks.n - 1, b, -1):
+        for i in range(self.blocks.size - 1, b, -1):
             source: BoundedDeque = self.blocks.get(i - 1)
             target: BoundedDeque = self.blocks.get(i)
 
@@ -115,13 +115,16 @@ class FurtherImprovedRAS:
                 break
 
     def _gather(self, b: int) -> None:
-        for i in range(b, self.blocks.n - 1):
+        for i in range(b, self.blocks.size - 1):
+            if self.blocks.get(i + 1).size == 0:
+                continue
+
             elem = self.blocks.get(i + 1).remove_first()
             self.blocks.get(i).add_last(elem)
         self._shrink()
 
     def _shrink(self):
-        r = self.blocks.n
+        r = self.blocks.size
 
         while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:
             self.blocks.a[r - 1] = None
@@ -144,10 +147,10 @@ class FurtherImprovedRAS:
         out = []
         out.append("\n=== Further Improved RootishArrayStack ===")
         out.append(f"elements           : {self.n}")
-        out.append(f"logical blocks     : {self.blocks.n}")
-        out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
+        out.append(f"logical blocks     : {self.blocks.size}")
+        out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.size}\n")
 
-        for i in range(self.blocks.n):
+        for i in range(self.blocks.size):
             block = self.blocks.get(i)
             b_start = i * (i + 1) // 2
             remaining_elements = max(0, self.n - b_start)
