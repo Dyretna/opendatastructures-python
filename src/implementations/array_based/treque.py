@@ -17,60 +17,90 @@ class Treque:
         return self.front.n + self.back.n
 
     def get(self, i: int) -> Any:
+        self._index_bounds_check(i)
         if i < self.front.size:
             return self.front.get(i)
         else:
             return self.back.get(i - self.front.size)
 
     def set(self, i: int, x: Any) -> None:
+        self._index_bounds_check(i)
         if i < self.front.size:
             return self.front.set(i, x)
         else:
             return self.back.set(i - self.front.size, x)
 
     def add_first(self, x: Any):
-        self.add(0, x)
+        self.front.add_first(x)
 
     def add_last(self, x: Any):
-        self.add(self.size, x)
+        self.back.add_last(x)
 
     def remove_first(self):
-        self.remove(0)
+        if self.size == 0:
+            raise IndexError("Treque is empty")
+        if self.front.n > 0:
+            return self.front.remove_first()
+        return self.back.remove_first()
 
     def remove_last(self):
-        self.remove(self.size)
+        if self.size == 0:
+            raise IndexError("Treque is empty")
+        if self.back.n > 0:
+            return self.back.remove_last()
+        return self.front.remove_last()
 
     # --------------------------------------------------------------
     # other public methods - with indexing etc...
     # --------------------------------------------------------------
 
     def add(self, i: int, x: Any) -> None:
-        self._balance()
+        self._index_bounds_check_adding(i)
+
         if i < self.front.size:
             self.front.add(i, x)
+            if self.front.size >= self.back.size * 3:
+                self._balance_front()
         else:
             self.back.add(i - self.front.size, x)
+            if self.back.size >= self.front.size * 3:
+                self._balance_back()
 
     def remove(self, i: int) -> Any:
-        self._balance()
+        self._index_bounds_check(i)
+
         if i < self.front.size:
-            self.front.add(i)
+            x = self.front.remove(i)
+            if self.back.size >= self.front.size * 3:
+                self._balance_back()
         else:
-            self.back.add(i - self.front.size)
+            x = self.back.remove(i - self.front.size)
+            if self.front.size >= self.back.size * 3:
+                self._balance_front()
+
+        return x
 
     # --------------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------------
 
-    def _balance(self):
-        mid = self.size // 2
-        if self.front.size >= self.back.size * 3:
-            while self.back.size < mid:
-                self.back.add_first(self.front.remove_last())
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
 
-        elif self.back.size >= self.front.size * 3:
-            while self.front.size < mid:
-                self.front.add_last(self.back.remove_first())
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
+
+    def _balance_back(self):
+        mid = self.size // 2
+        while self.front.size < mid:
+            self.front.add_last(self.back.remove_first())
+
+    def _balance_front(self):
+        mid = self.size // 2
+        while self.back.size < mid:
+            self.back.add_first(self.front.remove_last())
 
     def _rotate_left(self, r: int):
         pass
