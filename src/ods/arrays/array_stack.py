@@ -11,10 +11,6 @@ class ArrayStack:
     # ---------------------------------
 
     @property
-    def capacity(self):
-        return len(self.a)
-
-    @property
     def size(self):
         return self.n
 
@@ -33,8 +29,13 @@ class ArrayStack:
         return self.remove(self.n - 1)
 
     # ---------------------------------
-    # Additional public methods (from exercises)
+    # Additional public properties
+    # and methods (from exercises)
     # ---------------------------------
+
+    @property
+    def capacity(self):
+        return len(self.a)
 
     def add(self, i: int, x: Any):
         if self.n == len(self.a):

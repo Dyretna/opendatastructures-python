@@ -9,7 +9,7 @@ class ArrayQueue:
     """
 
     def __init__(self):
-        self.a = []  # simulates infinite array with mod (%)
+        self.a = [None] * 4  # simulates infinite array with mod (%)
         self.j = 0  # keeps track of next element to remove
         self.n = 0
 
@@ -44,6 +44,14 @@ class ArrayQueue:
         if len(self.a) >= 3 * self.n:
             self._resize()
         return x
+
+    # ---------------------------------
+    # Additional public properties
+    # ---------------------------------
+
+    @property
+    def capacity(self):
+        return len(self.a)
 
     # ---------------------------------
     # internal helpers

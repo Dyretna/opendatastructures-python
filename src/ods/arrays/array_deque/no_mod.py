@@ -26,6 +26,18 @@ class NoModDeque(ArrayDequeBase):
         self.a[idx] = x
         return y
 
+    def add_first(self, x: Any):
+        self.add(0, x)
+
+    def add_last(self, x: Any):
+        self.add(self.size, x)
+
+    def remove_first(self):
+        self.remove(0)
+
+    def remove_last(self):
+        self.remove(self.size)
+
     # -------------------------------------------------------
     # Public additions - operations with indexing, rotating...
     # -------------------------------------------------------

@@ -16,30 +16,18 @@ class ArrayDequeBase(ABC):
     def size(self):
         return self.n
 
-    def add_first(self, x: Any):
-        self.add(0, x)
+    abstractmethod
 
-    def add_last(self, x: Any):
-        self.add(self.size, x)
+    def add_first(self, x: Any): ...
 
-    def remove_first(self):
-        return self.remove(0)
+    abstractmethod
 
-    def remove_last(self):
-        return self.remove(self.size - 1)
+    def add_last(self, x: Any): ...
 
-    # ----------------------------------------------
-    # implemented in childclass - get and set
-    # operations might use modular arithmetic in some
-    # cases, and XOR operations in others
-    # ----------------------------------------------
+    abstractmethod
 
-    def get(self, i: int): ...
+    def remove_first(self): ...
 
-    def set(self, i: int, x: Any): ...
+    abstractmethod
 
-    @abstractmethod
-    def add(self, i: int, x: Any): ...
-
-    @abstractmethod
-    def remove(self, i: int): ...
+    def remove_last(self): ...

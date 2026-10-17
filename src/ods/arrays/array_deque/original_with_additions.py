@@ -13,16 +13,6 @@ class ArrayDeque(ArrayDequeBase):
     def size(self):
         return self.n
 
-    def get(self, i: int):
-        self._index_bounds_check(i)
-        return self.a[(self.j + i) % len(self.a)]
-
-    def set(self, i: int, x: Any):
-        self._index_bounds_check(i)
-        y = self.a[(self.j + i) % len(self.a)]
-        self.a[(self.j + i) % len(self.a)] = x
-        return y
-
     def add_first(self, x: Any):
         self.add(0, x)
 
@@ -36,12 +26,23 @@ class ArrayDeque(ArrayDequeBase):
         return self.remove(self.size - 1)
 
     # ------------------------------------------------------
-    # additional Deque operations - indexing, rotation, etc..
+    # additional Deque properties and
+    # operations - indexing, rotation, etc..
     # -----------------------------------------------------
 
     @property
     def capacity(self):
         return len(self.a)
+
+    def get(self, i: int):
+        self._index_bounds_check(i)
+        return self.a[(self.j + i) % len(self.a)]
+
+    def set(self, i: int, x: Any):
+        self._index_bounds_check(i)
+        y = self.a[(self.j + i) % len(self.a)]
+        self.a[(self.j + i) % len(self.a)] = x
+        return y
 
     def add(self, i: int, x: Any):
         self._index_bounds_check_adding(i)

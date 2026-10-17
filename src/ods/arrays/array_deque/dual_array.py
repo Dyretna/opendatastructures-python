@@ -16,18 +16,6 @@ class DualArrayDeque:
     def size(self):
         return self.front.n + self.back.n
 
-    def get(self, i: int):
-        if i < self.front.n:
-            return self.front.get(self.front.n - i - 1)
-        else:
-            return self.back.get(i - self.front.n)
-
-    def set(self, i: int, x: Any):
-        if i < self.front.n:
-            return self.front.set(self.front.n - i - 1, x)
-        else:
-            return self.back.set(i - self.front.n, x)
-
     def add_first(self, x: Any):
         self.add(0, x)
 
@@ -43,6 +31,18 @@ class DualArrayDeque:
     # ---------------------------------
     # Additional public methods
     # ---------------------------------
+
+    def get(self, i: int):
+        if i < self.front.n:
+            return self.front.get(self.front.n - i - 1)
+        else:
+            return self.back.get(i - self.front.n)
+
+    def set(self, i: int, x: Any):
+        if i < self.front.n:
+            return self.front.set(self.front.n - i - 1, x)
+        else:
+            return self.back.set(i - self.front.n, x)
 
     def add(self, i: int, x: Any):
         if i < self.front.n:
