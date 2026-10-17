@@ -9,6 +9,9 @@ class ArrayDeque(ArrayDequeBase):
     # - add_first(), add_last(), remove_first(), remove_last()
     # in parent class
     # ------------------------------------------------------
+    @property
+    def size(self):
+        return self.n
 
     def get(self, i: int):
         self._index_bounds_check(i)
@@ -19,6 +22,18 @@ class ArrayDeque(ArrayDequeBase):
         y = self.a[(self.j + i) % len(self.a)]
         self.a[(self.j + i) % len(self.a)] = x
         return y
+
+    def add_first(self, x: Any):
+        self.add(0, x)
+
+    def add_last(self, x: Any):
+        self.add(self.size, x)
+
+    def remove_first(self):
+        return self.remove(0)
+
+    def remove_last(self):
+        return self.remove(self.size - 1)
 
     # ------------------------------------------------------
     # additional Deque operations - indexing, rotation, etc..

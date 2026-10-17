@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from ..array_based import BoundedDeque
+from ..arrays import BoundedDeque
 
 
 class Node:

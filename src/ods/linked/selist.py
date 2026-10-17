@@ -1,6 +1,6 @@
 from typing import Any, Optional
 
-from ..array_based import BoundedDeque
+from ..arrays import BoundedDeque
 
 
 class Node:
@@ -52,7 +52,7 @@ class SEList:
 
     def append(self, x: Any):
         last = self.dummy.prev
-        if last == self.dummy or last.d.size() == self.b + 1:
+        if last == self.dummy or last.d.size == self.b + 1:
             last = self._add_before(self.dummy)
         last.d.add_last(x)
         self.n += 1
@@ -70,7 +70,7 @@ class SEList:
         # we increment steps until its still lower than block-size
         # Node 'w' cannot be dummy (go over one lap)
         # We make sure the BDeques in Nodes are full (spare space covered)
-        while r < self.b and w != self.dummy and w.d.size() == self.b + 1:
+        while r < self.b and w != self.dummy and w.d.size == self.b + 1:
             w = w.next
             r += 1
 
@@ -85,7 +85,7 @@ class SEList:
             w = self._add_before(w)
 
         while w != u:  # work backwards, shifting as we go
-            w.d.add_first(w.prev.d.pop_last())
+            w.d.add_first(w.prev.d.remove_last())
             w = w.prev
 
         w.d.add(j, x)
@@ -97,7 +97,7 @@ class SEList:
         w = u
         r = 0
 
-        while r < self.b and w != self.dummy and w.d.size() == self.b - 1:
+        while r < self.b and w != self.dummy and w.d.size == self.b - 1:
             w = w.next
             r += 1
 
@@ -108,11 +108,11 @@ class SEList:
             self._gather(u)
         u.d.remove(j)
 
-        while u.d.size() < self.b - 1 and u.next != self.dummy:
-            u.d.add_last(u.next.d.pop_first())
+        while u.d.size < self.b - 1 and u.next != self.dummy:
+            u.d.add_last(u.next.d.remove_first())
             u = u.next
 
-        if u.d.size() == 0:
+        if u.d.size == 0:
             print("remove, size is 0")
             self._remove_node(u)
 
@@ -126,8 +126,8 @@ class SEList:
     def _get_location(self, i: int) -> tuple[Node, int]:
         if i < self.n // 2:
             u = self.dummy.next
-            while i >= u.d.size():
-                i = i - u.d.size()
+            while i >= u.d.size:
+                i = i - u.d.size
                 u = u.next
             return u, i
 
@@ -136,7 +136,7 @@ class SEList:
             idx = self.n
             while i < idx:
                 u = u.prev
-                idx -= u.d.size()
+                idx -= u.d.size
         return u, i - idx
 
     def _new_node(self) -> Node:
@@ -161,15 +161,15 @@ class SEList:
 
         w = self._add_before(w)
         while w != u:
-            while w.d.size() < self.b:
-                w.d.add_first(w.prev.d.pop_last())
+            while w.d.size < self.b:
+                w.d.add_first(w.prev.d.remove_last())
             w = w.prev
 
     def _gather(self, u: Node) -> None:
         w = u
         for _ in range(self.b - 2):
-            while w.d.size() < self.b:
-                w.d.add_last(w.next.d.pop_first())
+            while w.d.size < self.b:
+                w.d.add_last(w.next.d.remove_first())
             w = w.next
         self._remove_node(w)
 
