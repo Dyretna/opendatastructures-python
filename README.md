@@ -1,8 +1,8 @@
 # opendatastructures-python
 
-Personal implementations, notes, and experiments based on Pat Morin's *Open Data Structures – Pseudocode Edition*. Started in September 2026, working through the book at a slow but steady pace.
-
-Unit tests will be added in time...
+Personal implementations, notes, and experiments based on Pat Morin's
+*Open Data Structures – Pseudocode Edition*. Started in September 2026,
+working through the book at a slow but steady pace.
 
 ### Open Datastructures - Pseudocode Edition (0.1Gβ)
 | Chapter | Contents                                       |
@@ -51,12 +51,43 @@ pip install -e .
 ## Pre-commit hooks
 The repo uses pre-commit with the following hooks:
 
-- General checks – YAML/TOML validation, merge conflict detection, end-of-file fixer, trailing whitespace removal
+- General checks – YAML/TOML validation, merge conflict detection,
+end-of-file fixer, trailing whitespace removal
 - isort (black profile) – sorts imports into correct order
 - toml-sort – sorts keys in TOML files
-- ruff – linting (ruff-check --fix) and formatting (ruff-format, the modern replacement for black)
+- ruff – linting (ruff-check --fix) and formatting (ruff-format,
+  the modern replacement for black)
 
 Run manually on all files:
 ```bash
 pre-commit run --all-files
+```
+
+## Testing
+
+So far the (early) chapters were primarily tested interactively through notebooks.
+This worked well while the implementations were small and easy to
+inspect manually.
+
+As the data structures have become more complex (SELists, RootishArrayStacks,
+and beyond), notebook-based testing alone has become increasingly painful.
+The project is therefore gradually adopting a proper pytest-based test suite.
+
+The notebooks remain useful as demonstrations, experiments, performance
+benchmarks, and educational walkthroughs, while correctness is verified
+through automated unit tests.
+
+Run the test suite:
+```bash
+pytest
+```
+
+Run a single test module:
+```bash
+pytest tests/arrays/test_array_stack.py
+```
+
+Verbose output:
+```bash
+pytest -v
 ```

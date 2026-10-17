@@ -3,12 +3,16 @@ from typing import Any
 
 class ArrayStack:
     def __init__(self):
-        self.a = []
+        self.a = [None] * 4
         self.n = 0
 
     # ---------------------------------
-    # Abstract interface requirements
+    # Morrins Interface requirements
     # ---------------------------------
+
+    @property
+    def capacity(self):
+        return len(self.a)
 
     @property
     def size(self):
@@ -29,12 +33,12 @@ class ArrayStack:
         return self.remove(self.n - 1)
 
     # ---------------------------------
-    # Additional public methods
+    # Additional public methods (from exercises)
     # ---------------------------------
 
     def add(self, i: int, x: Any):
         if self.n == len(self.a):
-            self._resize()
+            self._resize(max(4, len(self.a) * 2))
 
         # shift right: go backwards
         for j in range(self.n, i, -1):
@@ -55,8 +59,7 @@ class ArrayStack:
 
         self.n -= 1
 
-        if len(self.a) >= 3 * self.n:
-            self._resize()
+        self._maybe_shrink()
 
         return x
 
@@ -67,9 +70,8 @@ class ArrayStack:
             return
 
         # ensure capacity
-        if self.n + m > len(self.a):
-            new_capacity = max(1, 2 * (self.n + m))
-            b = [None] * new_capacity
+        if self.n + m > self.capacity:
+            b = [None] * self._new_capacity(m)
 
             # copy left part
             for j in range(i):
@@ -82,19 +84,16 @@ class ArrayStack:
             # copy right part
             for j in range(i, self.n):
                 b[j + m] = self.a[j]
-
             self.a = b
-            self.n += m
-            return
+        else:
+            # enough space: shift right
+            # backwards to not overwrite data
+            for j in range(self.n - 1, i - 1, -1):
+                self.a[j + m] = self.a[j]
 
-        # enough space: shift right
-        # backwards to not overwrite data
-        for j in range(self.n - 1, i - 1, -1):
-            self.a[j + m] = self.a[j]
-
-        # insert c
-        for j in range(m):
-            self.a[i + j] = c[j]
+            # insert c
+            for j in range(m):
+                self.a[i + j] = c[j]
 
         self.n += m
 
@@ -102,14 +101,21 @@ class ArrayStack:
     # internal helpers
     # ---------------------------------
 
-    def _resize(self):
-        # ensure at least size 1
-        new_capacity = max(1, 2 * self.n)
-        b = [None] * new_capacity
-        for i in range(self.n):
-            b[i] = self.a[i]
+    def _new_capacity(self, extra):
+        cap = max(1, self.capacity)
+        while self.n + extra > cap:
+            cap *= 2
+        return cap
 
+    def _resize(self, new_capacity):
+        b = [None] * new_capacity
+        for j in range(self.n):
+            b[j] = self.a[j]
         self.a = b
+
+    def _maybe_shrink(self):
+        if len(self.a) >= 4 and len(self.a) >= 3 * self.n:
+            self._resize(len(self.a) // 2)
 
     def __str__(self):
         out = [f" {__class__.__name__} ".center(50, "=")]

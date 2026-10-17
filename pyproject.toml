@@ -36,6 +36,12 @@ dev = [
 [project.urls]
 Repository = "https://github.com/Dyretna/opendatastructures-python"
 
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+
 [tool.setuptools]
 package-dir = {"" = "src"}
 
