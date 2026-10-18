@@ -33,12 +33,20 @@ class FurtherImprovedRAS:
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         # j is the index inside block b
         j = i - b * (b + 1) // 2
         return self.blocks.get(b).get(j)
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
         old = self.blocks.get(b).get(j)
@@ -52,6 +60,8 @@ class FurtherImprovedRAS:
         self.n += 1
 
     def add(self, i: int, x: Any):
+        self._index_bounds_check_adding(i)
+
         # if we add to end - simply append
         if i == self.n:
             self.append(x)
@@ -73,6 +83,10 @@ class FurtherImprovedRAS:
         self.n += 1
 
     def remove(self, i: int):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         x = self.get(i)
 
         b = self.i2b(i)
@@ -87,6 +101,14 @@ class FurtherImprovedRAS:
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
+
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
+
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
 
     def _initialize_first_block(self):
         self.blocks.a = [BoundedDeque(capacity=1)]

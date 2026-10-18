@@ -1,3 +1,57 @@
+"""
+This is a work in progress, below i am working out an
+idea.
+
+We can see in the exercise description, that we should be able to
+shift elements to both directions when adding or removing. The core
+conceptual problem is, if we are to shift elements to the left how
+do we grow extra space, when the blocks in the rootish structure
+grows towards the end?
+
+While the next exercise (2.10) hints towards a SEL-like solution,
+using bounded deques, 2.9 has no such hints, therefore the
+datastructures from this chapter should be enough.
+
+while i thought i had a solution and moved on the next, this was
+really not the case - i had just copied the original version, tried
+something, and forgot about it.
+
+pondering the conceptual problem here, with having blocks that increases
+in size by one, and having to shift to the left... stacks wont help,
+queues wont help, and deques won't either...
+
+the closest thing must be the DualArrayDeque.. with something similar,
+we could build an hourglass-like rootish structure as below:
+
+    front_blocks
+
+    [4,4,4,4]
+    [3,3,3]
+    [2,2]
+    [1]
+
+    -- centre --
+
+    [1]
+    [2,2]
+    [3,3,3]
+    [4,4,4,4]
+
+    back_blocks
+
+That seems to be like that way to go forward, it would be easy to extend
+with new blocks at both ends, so i will try to go further with this idea.
+The new problem will be the index to block translation in the method:
+
+    ```
+    def i2b(self, i: int):
+        return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
+    ```
+
+and i hit another brick wall. to be continued...
+
+"""
+
 from math import ceil, sqrt
 from typing import Any
 
@@ -10,7 +64,7 @@ class ImprovedRAS:
     has only O(√n) wasted space, but that can perform
     add(i, x) and remove(i, x) operations in
 
-        *O(1 + min{i , n - i})*
+        *O(1 + min{i, n - i})*
 
     time.
 
@@ -18,25 +72,34 @@ class ImprovedRAS:
 
     def __init__(self):
         self.n = 0
-        self.blocks = ArrayStack()
+        self.front_blocks = ArrayStack()
+        self.back_blocks = ArrayStack()
 
     @property
     def size(self):
-        return self.n
+        return self.front_blocks.n + self.back_blocks.n
 
     def is_empty(self):
-        return self.n == 0
+        return self.size == 0
 
     def i2b(self, i: int):
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         # j is the index inside block b
         j = i - b * (b + 1) // 2
         return self.blocks.get(b)[j]
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
         old = self.blocks.get(b)[j]
@@ -44,59 +107,38 @@ class ImprovedRAS:
         return old
 
     def add(self, i: int, x: Any):
-        # ensure there is room for one more element:
-        # while total capacity < n+1, grow
-        r = self.blocks.n
+        self._index_bounds_check_adding(i)
 
-        while r * (r + 1) // 2 < self.n + 1:
-            self._grow()
-            r = self.blocks.n
-
-        self.n += 1
-
-        if i < self.n // 2:
-            # shift elements left side upward
-            for j in range(0, i):
-                self.set(j, self.get(j))
-            for j in range(i, 0, -1):
-                self.set(j, self.get(j - 1))
-            self.set(i, x)
-        else:
-            # shift right side downward
-            for j in range(self.n - 1, i, -1):
-                self.set(j, self.get(j - 1))
-            self.set(i, x)
+        ...
 
     def remove(self, i: int):
-        x = self.get(i)
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
 
-        if i < self.n // 2:
-            # shift left side downward
-            for j in range(i, 0, -1):
-                self.set(j, self.get(j - 1))
-        else:
-            # shift right side upward
-            for j in range(i, self.n - 1):
-                self.set(j, self.get(j + 1))
-
-        self.n -= 1
-        self._shrink()
-
-        return x
+        ...
 
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
 
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
+
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
+
     def _grow(self):
         # add a new block of size r+1 (filled with None)
-        r = self.blocks.n
+        r = self.blocks.size
         new_block = [None] * (r + 1)
         # append at the end of blocks
-        self.blocks.add(self.blocks.n, new_block)
+        self.blocks.add(self.blocks.size, new_block)
 
     def _shrink(self):
-        r = self.blocks.n
+        r = self.blocks.size
 
         while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:
             self.blocks.a[r - 1] = None

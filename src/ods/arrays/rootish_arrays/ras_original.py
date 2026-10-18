@@ -24,12 +24,20 @@ class RootishArrayStack:
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         # j is the index inside block b
         j = i - b * (b + 1) // 2
         return self.blocks.get(b)[j]
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
         # return a shallow copy of the old value, then replace it
@@ -38,6 +46,8 @@ class RootishArrayStack:
         return y
 
     def add(self, i: int, x: Any):
+        self._index_bounds_check_adding(i)
+
         # ensure there is room for one more element:
         # while total capacity < n+1, grow
         r = self.blocks.size
@@ -51,6 +61,10 @@ class RootishArrayStack:
         self.set(i, x)
 
     def remove(self, i: int):
+        if self.is_empty():
+            raise IndexError("Stack is empty.")
+        self._index_bounds_check(i)
+
         x = self.get(i)
 
         # shift elements left to fill the gap
@@ -66,6 +80,14 @@ class RootishArrayStack:
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
+
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
+
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
 
     def _grow(self):
         # add a new block of size n + 1 (filled with None)
