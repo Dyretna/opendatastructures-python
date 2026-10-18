@@ -16,18 +16,14 @@ class ArrayDequeBase(ABC):
     def size(self):
         return self.n
 
-    abstractmethod
-
+    @abstractmethod
     def add_first(self, x: Any): ...
 
-    abstractmethod
-
+    @abstractmethod
     def add_last(self, x: Any): ...
 
-    abstractmethod
-
+    @abstractmethod
     def remove_first(self): ...
 
-    abstractmethod
-
+    @abstractmethod
     def remove_last(self): ...

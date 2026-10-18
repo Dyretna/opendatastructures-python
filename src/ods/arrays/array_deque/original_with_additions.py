@@ -6,12 +6,19 @@ from .base import ArrayDequeBase
 class ArrayDeque(ArrayDequeBase):
     # ------------------------------------------------------
     # Abstract interface requirements
-    # - add_first(), add_last(), remove_first(), remove_last()
-    # in parent class
+    # + convenience methods and properties
     # ------------------------------------------------------
+
     @property
     def size(self):
         return self.n
+
+    @property
+    def capacity(self):
+        return len(self.a)
+
+    def is_empty(self):
+        return self.n == 0
 
     def add_first(self, x: Any):
         self.add(0, x)
@@ -26,13 +33,8 @@ class ArrayDeque(ArrayDequeBase):
         return self.remove(self.size - 1)
 
     # ------------------------------------------------------
-    # additional Deque properties and
-    # operations - indexing, rotation, etc..
+    # additional methods - indexing, rotation, etc..
     # -----------------------------------------------------
-
-    @property
-    def capacity(self):
-        return len(self.a)
 
     def get(self, i: int):
         self._index_bounds_check(i)
@@ -105,6 +107,9 @@ class ArrayDeque(ArrayDequeBase):
         self.n += m
 
     def remove(self, i: int):
+        if self.is_empty():
+            raise IndexError("pop from empty deque")
+
         self._index_bounds_check(i)
 
         x = self.a[(self.j + i) % self.capacity]

@@ -10,21 +10,21 @@ class NoModDeque(ArrayDequeBase):
         self.n = 0
         self.j = 0
 
-    # -------------------------------------------------------
+    # ------------------------------------------------------
     # Abstract interface requirements
-    # -------------------------------------------------------
+    # + convenience methods and properties
+    # ------------------------------------------------------
 
-    def get(self, i: int):
-        self._index_bounds_check(i)
-        return self.a[(self.j + i) & (len(self.a) - 1)]
+    @property
+    def size(self):
+        return self.n
 
-    def set(self, i: int, x: Any):
-        self._index_bounds_check(i)
-        idx = (self.j + i) & (len(self.a) - 1)
+    @property
+    def capacity(self):
+        return len(self.a)
 
-        y = self.a[idx]
-        self.a[idx] = x
-        return y
+    def is_empty(self):
+        return self.n == 0
 
     def add_first(self, x: Any):
         self.add(0, x)
@@ -33,30 +33,42 @@ class NoModDeque(ArrayDequeBase):
         self.add(self.size, x)
 
     def remove_first(self):
-        self.remove(0)
+        return self.remove(0)
 
     def remove_last(self):
-        self.remove(self.size)
+        return self.remove(self.size - 1)
 
     # -------------------------------------------------------
     # Public additions - operations with indexing, rotating...
     # -------------------------------------------------------
 
+    def get(self, i: int):
+        self._index_bounds_check(i)
+        return self.a[(self.j + i) & (self.capacity - 1)]
+
+    def set(self, i: int, x: Any):
+        self._index_bounds_check(i)
+        idx = (self.j + i) & (self.capacity - 1)
+
+        y = self.a[idx]
+        self.a[idx] = x
+        return y
+
     def add(self, i: int, x: Any):
         self._index_bounds_check_adding(i)
 
-        if self.n == len(self.a):
+        if self.n == self.capacity:
             self._resize_grow()
 
         if i < self.size / 2:
-            self.j = (self.j - 1) & (len(self.a) - 1)
+            self.j = (self.j - 1) & (self.capacity - 1)
             for k in range(i):
                 self._shift_section_left(k)
         else:
             for k in range(self.n, i, -1):
                 self._shift_section_right(k)
 
-        self.a[(self.j + i) & (len(self.a) - 1)] = x
+        self.a[(self.j + i) & (self.capacity - 1)] = x
         self.n += 1
 
     def add_all(self, i: int, c: list):
@@ -68,8 +80,8 @@ class NoModDeque(ArrayDequeBase):
             return
 
         # ensure capacity
-        if self.n + m > len(self.a):
-            new_capacity = len(self.a)
+        if self.n + m > self.capacity:
+            new_capacity = self.capacity
             while new_capacity < self.n + m:
                 new_capacity *= 2
 
@@ -77,7 +89,7 @@ class NoModDeque(ArrayDequeBase):
 
             # left side
             for k in range(i):
-                b[k] = self.a[(self.j + k) & (len(self.a) - 1)]
+                b[k] = self.a[(self.j + k) & (self.capacity - 1)]
 
             # inserted
             for k in range(m):
@@ -85,7 +97,7 @@ class NoModDeque(ArrayDequeBase):
 
             # right side
             for k in range(i, self.size):
-                b[k + m] = self.a[(self.j + k) & (len(self.a) - 1)]
+                b[k + m] = self.a[(self.j + k) & (self.capacity - 1)]
 
             self.a = b
             self.j = 0
@@ -98,21 +110,23 @@ class NoModDeque(ArrayDequeBase):
 
         # insert c
         for k in range(m):
-            self.a[(self.j + i + k) & (len(self.a) - 1)] = c[k]
+            self.a[(self.j + i + k) & (self.capacity - 1)] = c[k]
 
         self.n += m
 
     def remove(self, i: int):
+        if self.is_empty():
+            raise IndexError("pop from empty deque")
         self._index_bounds_check(i)
 
-        x = self.a[(self.j + i) & (len(self.a) - 1)]
+        x = self.a[(self.j + i) & (self.capacity - 1)]
 
         if i < self.n / 2:
             # left-side
             for r in range(i, 0, -1):
                 self._shift_section_right(r)
             self.a[self.j] = None
-            self.j = (self.j + 1) & (len(self.a) - 1)
+            self.j = (self.j + 1) & (self.capacity - 1)
         else:
             # right-side
             for k in range(i, self.size - 1):
@@ -120,7 +134,7 @@ class NoModDeque(ArrayDequeBase):
 
         self.n -= 1
 
-        if self.size <= len(self.a) // 3:
+        if self.size <= self.capacity // 3:
             self._resize_shrink()
 
         return x
@@ -148,33 +162,33 @@ class NoModDeque(ArrayDequeBase):
             raise IndexError("index not in range")
 
     def _resize_grow(self):
-        new_capacity = len(self.a) * 2
+        new_capacity = self.capacity * 2
         self._set_new_array(new_capacity)
 
     def _resize_shrink(self):
-        if len(self.a) == self.min_size:
+        if self.capacity == self.min_size:
             return
         else:
-            new_capacity = len(self.a) // 2
+            new_capacity = self.capacity // 2
         self._set_new_array(new_capacity)
 
     def _set_new_array(self, new_capacity: int):
         b = [None] * new_capacity
 
         for k in range(self.n):
-            b[k] = self.a[(self.j + k) & (len(self.a) - 1)]
+            b[k] = self.a[(self.j + k) & (self.capacity - 1)]
 
         self.a = b
         self.j = 0
 
     def _shift_section_left(self, i: int):
-        self.a[(self.j + i) & len(self.a) - 1] = self.a[
-            (self.j + i + 1) & (len(self.a) - 1)
+        self.a[(self.j + i) & self.capacity - 1] = self.a[
+            (self.j + i + 1) & (self.capacity - 1)
         ]
 
     def _shift_section_right(self, i: int):
-        self.a[(self.j + i) & len(self.a) - 1] = self.a[
-            (self.j + i - 1) & (len(self.a) - 1)
+        self.a[(self.j + i) & self.capacity - 1] = self.a[
+            (self.j + i - 1) & (self.capacity - 1)
         ]
 
     # --- Rotating ---
@@ -183,7 +197,7 @@ class NoModDeque(ArrayDequeBase):
             return
 
         r %= self.size
-        mask = len(self.a) - 1
+        mask = self.capacity - 1
 
         for _ in range(r):
             first = self.a[self.j]
@@ -203,7 +217,7 @@ class NoModDeque(ArrayDequeBase):
             return
 
         r %= self.size
-        mask = len(self.a) - 1
+        mask = self.capacity - 1
 
         for _ in range(r):
             last = self.a[(self.j + self.size - 1) & mask]

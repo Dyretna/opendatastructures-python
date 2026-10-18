@@ -18,13 +18,30 @@ class OrderedDeque:
         self._initialize_block()
         self.n = 0
 
-    # --------------------------------------------------------
+    # ------------------------------------------------------
     # Abstract interface requirements
-    # --------------------------------------------------------
+    # + convenience methods and properties
+    # + get and set
+    # ------------------------------------------------------
 
     @property
     def size(self):
         return self.n
+
+    @property
+    def capacity(self):
+        return len(self.a)
+
+    def is_empty(self):
+        return self.n == 0
+
+    def get(self, i: int):
+        return self.a[self.block_start + i]
+
+    def set(self, i: int, x: Any):
+        y = self.a[self.block_start + i]
+        self.a[self.block_start + i] = x
+        return y
 
     def add_first(self, x: Any):
         if self.size == 0:
@@ -53,9 +70,10 @@ class OrderedDeque:
         self.n += 1
 
     def remove_first(self) -> Any:
-        if self.n == 0:
+        if self.is_empty():
             raise IndexError("pop from empty deque")
-        val = self.a[self.block_start]
+
+        x = self.a[self.block_start]
         self.a[self.block_start] = None
         self.block_start += 1
         self.n -= 1
@@ -65,12 +83,13 @@ class OrderedDeque:
         if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
             self._rebuild(self.capacity // 2)
 
-        return val
+        return x
 
     def remove_last(self) -> Any:
-        if self.n == 0:
+        if self.is_empty():
             raise IndexError("pop from empty deque")
-        val = self.a[self.block_start]
+
+        x = self.a[self.block_end]
         self.a[self.block_end] = None
         self.block_end -= 1
         self.n -= 1
@@ -80,15 +99,7 @@ class OrderedDeque:
         if self.size <= self.capacity // 3 and self.capacity != self.min_capacity:
             self._rebuild(self.capacity // 2)
 
-        return val
-
-    # --------------------------------------------------------
-    # Additional public properties and methods
-    # --------------------------------------------------------
-
-    @property
-    def capacity(self):
-        return len(self.a)
+        return x
 
     # --------------------------------------------------------
     # Internal Helpers

@@ -13,13 +13,21 @@ class ArrayQueue:
         self.j = 0  # keeps track of next element to remove
         self.n = 0
 
-    # ---------------------------------
+    # ------------------------------------------------------
     # Abstract interface requirements
-    # ---------------------------------
+    # + convenience methods and properties
+    # ------------------------------------------------------
 
     @property
     def size(self):
         return self.n
+
+    @property
+    def capacity(self):
+        return len(self.a)
+
+    def is_empty(self):
+        return self.n == 0
 
     def get(self, i: int):
         return self.a[(i + self.j) % len(self.a)]
@@ -37,6 +45,9 @@ class ArrayQueue:
         return True
 
     def remove(self):
+        if self.is_empty():
+            raise IndexError("remove from empty Queue")
+
         x = self.a[self.j]
         self.j = (self.j + 1) % len(self.a)
         self.n -= 1
@@ -44,14 +55,6 @@ class ArrayQueue:
         if len(self.a) >= 3 * self.n:
             self._resize()
         return x
-
-    # ---------------------------------
-    # Additional public properties
-    # ---------------------------------
-
-    @property
-    def capacity(self):
-        return len(self.a)
 
     # ---------------------------------
     # internal helpers

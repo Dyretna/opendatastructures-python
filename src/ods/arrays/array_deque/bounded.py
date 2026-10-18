@@ -9,17 +9,9 @@ class BoundedDeque(ArrayDeque):
         self.j = 0
         self.n = 0
 
-    # ---------------------------------
-    # Additional public properties and methods
-    # ---------------------------------
-
-    @property
-    def capacity(self):
-        return len(self.a)
-
     def add(self, i: int, x: Any):
         if self.size == self.capacity:
-            raise Exception("Block full")
+            raise ValueError("Bounded Deque is full")
 
         if self.size == 0:
             self.a[self.j] = x

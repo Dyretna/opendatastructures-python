@@ -6,13 +6,21 @@ class ArrayStack:
         self.a = [None] * 4
         self.n = 0
 
-    # ---------------------------------
-    # Morrins Interface requirements
-    # ---------------------------------
+    # ------------------------------------------------------
+    # Abstract interface requirements
+    # + convenience methods and properties
+    # ------------------------------------------------------
 
     @property
     def size(self):
         return self.n
+
+    @property
+    def capacity(self):
+        return len(self.a)
+
+    def is_empty(self):
+        return self.n == 0
 
     def get(self, i: int):
         return self.a[i]
@@ -28,14 +36,9 @@ class ArrayStack:
     def pop(self):
         return self.remove(self.n - 1)
 
-    # ---------------------------------
-    # Additional public properties
-    # and methods (from exercises)
-    # ---------------------------------
-
-    @property
-    def capacity(self):
-        return len(self.a)
+    # ------------------------------------------------------
+    # additional methods - index ops, etc
+    # -----------------------------------------------------
 
     def add(self, i: int, x: Any):
         if self.n == len(self.a):
@@ -49,6 +52,8 @@ class ArrayStack:
         self.n += 1
 
     def remove(self, i: int):
+        if self.is_empty():
+            raise IndexError("remove from empty stack")
         x = self.a[i]
 
         # shift left

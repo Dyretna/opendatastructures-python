@@ -1,13 +1,5 @@
 from ods.arrays import ArrayQueue
 
-
-def assert_matches_python_list(s: ArrayQueue, ref: list):
-    assert s.size == len(ref)
-
-    for i in range(len(ref)):
-        assert s.get(i) == ref[i]
-
-
 # --------------------------------------------------
 # stack abstract interface methods: add(), remove()
 # --------------------------------------------------

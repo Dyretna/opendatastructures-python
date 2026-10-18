@@ -22,6 +22,13 @@ class FurtherImprovedRAS:
         self.blocks: ArrayStack[BoundedDeque | None] = ArrayStack()
         self._initialize_first_block()  # insert bdeque with cap = 1
 
+    @property
+    def size(self):
+        return self.n
+
+    def is_empty(self):
+        return self.n == 0
+
     def i2b(self, i: int):
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 

@@ -11,6 +11,13 @@ class RootishArrayStack:
         # stack of blocks; each block is a Python list
         self.blocks = ArrayStack()
 
+    @property
+    def size(self):
+        return self.n
+
+    def is_empty(self):
+        return self.n == 0
+
     def i2b(self, i: int):
         # compute block index b that contains element at list index i (0-based)
         # solve (b+1)(b+2)/2 >= i+1 and take the ceiling of the positive root
@@ -33,7 +40,7 @@ class RootishArrayStack:
     def add(self, i: int, x: Any):
         # ensure there is room for one more element:
         # while total capacity < n+1, grow
-        r = self.blocks.n
+        r = self.blocks.size
         if r * (r + 1) / 2 < self.n + 1:
             self._grow()
 

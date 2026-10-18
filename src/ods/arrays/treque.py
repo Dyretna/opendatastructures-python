@@ -16,6 +16,9 @@ class Treque:
     def size(self):
         return self.front.n + self.back.n
 
+    def is_empty(self):
+        return self.size == 0
+
     def get(self, i: int) -> Any:
         self._index_bounds_check(i)
         if i < self.front.size:
@@ -37,14 +40,14 @@ class Treque:
         self.back.add_last(x)
 
     def remove_first(self):
-        if self.size == 0:
+        if self.is_empty():
             raise IndexError("Treque is empty")
         if self.front.n > 0:
             return self.front.remove_first()
         return self.back.remove_first()
 
     def remove_last(self):
-        if self.size == 0:
+        if self.is_empty():
             raise IndexError("Treque is empty")
         if self.back.n > 0:
             return self.back.remove_last()
@@ -67,6 +70,8 @@ class Treque:
                 self._balance_back()
 
     def remove(self, i: int) -> Any:
+        if self.is_empty():
+            raise IndexError("Treque is empty")
         self._index_bounds_check(i)
 
         if i < self.front.size:
