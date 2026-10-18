@@ -157,8 +157,8 @@ class ImprovedRAS:
         out = []
         out.append("\n=== Improved RootishArrayStack ===")
         out.append(f"elements           : {self.n}")
-        out.append(f"logical blocks     : {self.blocks.n}")
-        out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
+        # out.append(f"logical blocks     : {self.blocks.n}")
+        # out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
 
         for i in range(self.blocks.n):
             block = self.blocks.get(i)

@@ -23,9 +23,17 @@ class ArrayStack:
         return self.n == 0
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("empty... ")
+        self._index_bounds_check(i)
+
         return self.a[i]
 
     def set(self, i: int, x: Any) -> Any:
+        if self.is_empty():
+            raise IndexError("empty... ")
+        self._index_bounds_check(i)
+
         y = self.a[i]
         self.a[i] = x
         return y
@@ -41,6 +49,7 @@ class ArrayStack:
     # -----------------------------------------------------
 
     def add(self, i: int, x: Any):
+        self._index_bounds_check_adding(i)
         if self.n == len(self.a):
             self._resize(max(4, len(self.a) * 2))
 
@@ -52,6 +61,7 @@ class ArrayStack:
         self.n += 1
 
     def remove(self, i: int):
+        self._index_bounds_check(i)
         if self.is_empty():
             raise IndexError("remove from empty stack")
         x = self.a[i]
@@ -106,6 +116,14 @@ class ArrayStack:
     # ---------------------------------
     # internal helpers
     # ---------------------------------
+
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
+
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
 
     def _new_capacity(self, extra):
         cap = max(1, self.capacity)

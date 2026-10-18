@@ -43,11 +43,17 @@ class NoModDeque(ArrayDequeBase):
     # -------------------------------------------------------
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
+
         return self.a[(self.j + i) & (self.capacity - 1)]
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
+
         idx = (self.j + i) & (self.capacity - 1)
 
         y = self.a[idx]

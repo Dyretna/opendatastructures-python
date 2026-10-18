@@ -37,6 +37,8 @@ class DualArrayDeque:
     # ---------------------------------
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
 
         if i < self.front.n:
@@ -45,6 +47,8 @@ class DualArrayDeque:
             return self.back.get(i - self.front.n)
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
 
         if i < self.front.n:

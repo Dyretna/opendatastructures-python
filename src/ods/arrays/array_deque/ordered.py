@@ -36,9 +36,17 @@ class OrderedDeque:
         return self.n == 0
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("empty... ")
+        self._index_bounds_check(i)
+
         return self.a[self.block_start + i]
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("empty... ")
+        self._index_bounds_check(i)
+
         y = self.a[self.block_start + i]
         self.a[self.block_start + i] = x
         return y
@@ -104,6 +112,14 @@ class OrderedDeque:
     # --------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------
+
+    def _index_bounds_check(self, i: int):
+        if not (0 <= i <= self.size - 1):
+            raise IndexError("index not in range")
+
+    def _index_bounds_check_adding(self, i: int):
+        if not (0 <= i <= self.size):
+            raise IndexError("index not in range")
 
     def _rebuild(self, new_capacity: int):
         b = [None] * new_capacity

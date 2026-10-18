@@ -37,11 +37,17 @@ class ArrayDeque(ArrayDequeBase):
     # -----------------------------------------------------
 
     def get(self, i: int):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
+
         return self.a[(self.j + i) % len(self.a)]
 
     def set(self, i: int, x: Any):
+        if self.is_empty():
+            raise IndexError("empty... ")
         self._index_bounds_check(i)
+
         y = self.a[(self.j + i) % len(self.a)]
         self.a[(self.j + i) % len(self.a)] = x
         return y
