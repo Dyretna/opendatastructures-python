@@ -40,7 +40,7 @@ class RootishArrayStack:
 
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
-        # return a shallow copy of the old value, then replace it
+        # return a copy of the old value, then replace it
         y = self.blocks.get(b)[j]
         self.blocks.get(b)[j] = x
         return y

@@ -23,19 +23,19 @@ queues wont help, and deques won't either...
 the closest thing must be the DualArrayDeque.. with something similar,
 we could build an hourglass-like rootish structure as below:
 
-    front_blocks
+    front_blocks (but inverted, back to back)
 
-    [4,4,4,4]
-    [3,3,3]
-    [2,2]
-    [1]
+    [1,2,3,4]
+    [6,5,7]
+    [8,9]
+    [10]
 
     -- centre --
 
-    [1]
-    [2,2]
-    [3,3,3]
-    [4,4,4,4]
+    [11]
+    [12,13]
+    [14,15,16]
+    [17,18,19,20]
 
     back_blocks
 
@@ -47,8 +47,6 @@ The new problem will be the index to block translation in the method:
     def i2b(self, i: int):
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
     ```
-
-and i hit another brick wall. to be continued...
 
 """
 
@@ -72,38 +70,65 @@ class ImprovedRAS:
 
     def __init__(self):
         self.n = 0
-        self.front_blocks = ArrayStack()
-        self.back_blocks = ArrayStack()
+        self.front_n = 0
+        self.front = ArrayStack()
+        self.back = ArrayStack()
 
     @property
     def size(self):
-        return self.front_blocks.n + self.back_blocks.n
+        return self.n
+
+    @property
+    def total_blocks(self):
+        return self.front.size + self.back.size
 
     def is_empty(self):
         return self.size == 0
-
-    def i2b(self, i: int):
-        return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
 
     def get(self, i):
         if self.is_empty():
             raise IndexError("Stack is empty.")
         self._index_bounds_check(i)
 
-        b = self.i2b(i)
-        # j is the index inside block b
-        j = i - b * (b + 1) // 2
-        return self.blocks.get(b)[j]
+        # 1. Determine correct ArrayStack (ASS) half, and
+        # 2. transform global index 'i' to local index 'p'
+        stack_half, p = self._get_as_half_and_p(i)
+
+        # 3. locate block index and get block from ArrayStack.
+        b = self._i2b(p)
+        block = stack_half.get(b)
+
+        # 4. get local offset inside block using
+        # local index 'p' on block index 'b'
+        j = self._determine_block_offset(p, b)
+
+        # 5. depending on array, get value from block,
+        # if front: reversed order and mirrored offset.
+        # if back : simple index.
+        if stack_half == self.front:
+            return block[len(block) - j - 1]
+        else:
+            return block[j]
 
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("Stack is empty.")
         self._index_bounds_check(i)
 
-        b = self.i2b(i)
-        j = i - b * (b + 1) // 2
-        old = self.blocks.get(b)[j]
-        self.blocks.get(b)[j] = x
+        stack_half, p = self._get_as_half_and_p(i)
+
+        b = self._i2b(p)
+        block = stack_half.get(b)
+
+        j = self._determine_block_offset(p, b)
+
+        if stack_half == self.front:
+            old = block[len(block) - j - 1]
+            block[len(block) - j - 1] = x
+        else:
+            old = block[j]
+            block[j] = x
+
         return old
 
     def add(self, i: int, x: Any):
@@ -121,6 +146,35 @@ class ImprovedRAS:
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
+
+    def _i2b(self, i: int):
+        return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
+
+    def _determine_block_offset(self, i: int, b: int):
+        """
+        If index i is in block b, then the number of
+        elements in blocks 0, ... , b - 1 is b(b + 1)/2.
+        Therefore, j, the offset of i,
+        is stored at location:
+
+        """
+        return i - b * (b + 1) // 2
+
+    def _get_as_half_and_p(self, i: int):
+        """
+        Returns correct ArrayStack half, and its local index.
+
+        Translates similar to a DualArrayDeque, back to back.
+        Makes use of the total number of elements stored
+        in the front half (self.front_n).
+
+        """
+        if i < self.front_n:
+            p = self.front_n - i - 1
+            return self.front, p
+        else:
+            p = i - self.front_n
+            return self.back, p
 
     def _index_bounds_check(self, i: int):
         if not (0 <= i <= self.size - 1):
@@ -146,27 +200,12 @@ class ImprovedRAS:
             r -= 1
 
     def __str__(self):
-        """Displays blocks with zombie values masked as None.
-
-        Keeps implementation faithful to pseudocode and optimized:
-        - Zombie values not cleared in remove() (left for natural overwrite)
-        - Same block lists reused (no new allocations on add)
-        - Output shows only visible elements within current n
-        """
+        """ """
 
         out = []
         out.append("\n=== Improved RootishArrayStack ===")
         out.append(f"elements           : {self.n}")
         # out.append(f"logical blocks     : {self.blocks.n}")
         # out.append(f"reserved blocks    : {len(self.blocks.a) - self.blocks.n}\n")
-
-        for i in range(self.blocks.n):
-            block = self.blocks.get(i)
-            b_start = i * (i + 1) // 2
-            remaining_elements = max(0, self.n - b_start)
-            visible_count = min(len(block), remaining_elements)
-
-            display = block[:visible_count] + [None] * (len(block) - visible_count)
-            out.append(f"block {i:^3}: {display}")
 
         return "\n".join(out)

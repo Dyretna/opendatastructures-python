@@ -41,7 +41,7 @@ class DualArrayDeque:
             raise IndexError("empty... ")
         self._index_bounds_check(i)
 
-        if i < self.front.n:
+        if i < self.front.size:
             return self.front.get(self.front.n - i - 1)
         else:
             return self.back.get(i - self.front.n)
@@ -51,7 +51,7 @@ class DualArrayDeque:
             raise IndexError("empty... ")
         self._index_bounds_check(i)
 
-        if i < self.front.n:
+        if i < self.front.size:
             return self.front.set(self.front.n - i - 1, x)
         else:
             return self.back.set(i - self.front.n, x)
