@@ -96,8 +96,6 @@ class RootishArrayStack:
         self.blocks.add(self.blocks.n, new_block)
 
     def _shrink(self):
-        # optional separate shrink method:
-        # remove trailing blocks while capacity is excessive
         r = self.blocks.n
         while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:
             self.blocks.a[r - 1] = None

@@ -11,11 +11,11 @@ import random
 
 import pytest
 
-from ods.arrays import RootishArrayStack
+from ods.arrays import ImprovedRAS, RootishArrayStack
 
 RAS_IMPLEMENTATIONS = [
     RootishArrayStack,
-    # ImprovedRAS,       <--- under construction...
+    ImprovedRAS,
     # FurtherImprovedRAS,  <--- under construction...
 ]
 
