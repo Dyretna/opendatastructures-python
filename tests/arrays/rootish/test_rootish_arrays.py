@@ -16,7 +16,7 @@ from ods.arrays import ImprovedRAS, RootishArrayStack
 RAS_IMPLEMENTATIONS = [
     RootishArrayStack,
     ImprovedRAS,
-    # FurtherImprovedRAS,  <--- under construction...
+    # FurtherImprovedRAS,
 ]
 
 

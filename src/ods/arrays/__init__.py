@@ -9,7 +9,7 @@ from .array_queue import ArrayQueue
 from .array_stack import ArrayStack
 from .min_arrays import MinDeque, MinQueue, MinStack
 from .random_queue import RandomQeue
-from .rootish_arrays import FurtherImprovedRAS, ImprovedRAS, RootishArrayStack
+from .rootish_arrays import ImprovedRAS, RootishArrayStack
 from .treque import Treque
 
 __all__ = [
@@ -25,7 +25,6 @@ __all__ = [
     "MinDeque",
     # ras
     "ImprovedRAS",
-    "FurtherImprovedRAS",
     "RootishArrayDeque",
     "RootishArrayStack",
     # the rest
