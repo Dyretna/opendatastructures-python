@@ -164,12 +164,81 @@ class SkiplistSSet:
     def _find_pred_node(self, x: int):
         """
         Return the predecessor of x (largest value < x) at level 0.
+        Exercise 4.8: avoids redundant comparisons.
+        """
+        u = self.sentinel
+        r = self.h
+        already_checked = None
+
+        while r >= 0:
+            while u.next[r] is not None:
+                # we already know this node failed the comparison
+                # on a higher level, so skip comparison
+                if u.next[r] is already_checked:
+                    break
+
+                if u.next[r].x < x:
+                    u = u.next[r]
+                else:
+                    already_checked = u.next[r]
+                    break
+
+            r -= 1
+
+        return u
+
+    # --------------------------------------
+    # Legacy and benchmark methods,
+    # saved for benchmarking in exercises.
+    # --------------------------------------
+
+    def _find_pred_node_bench(self, x: int):
+        """
+        Return the predecessor of x (largest value < x) at level 0.
+        Exercise 4.8: avoids redundant comparisons.
         """
         u = self.sentinel
         r = self.h
 
+        counter = 0
+        already_checked = None
+
         while r >= 0:
-            while u.next[r] is not None and u.next[r].x < x:
-                u = u.next[r]  # go right in list r
+            while u.next[r] is not None:
+                # we already know this node failed the comparison
+                # on a higher level, so skip comparison
+                if u.next[r] is already_checked:
+                    break
+
+                counter += 1
+
+                if u.next[r].x < x:
+                    u = u.next[r]
+                else:
+                    already_checked = u.next[r]
+                    break
+
+            r -= 1
+
+        return u, counter
+
+    def _find_pred_node_legacy(self, x: int):
+        """
+        Return the predecessor of x (largest value < x) at level 0.
+        Modified for benchamrking with new version.
+        """
+        u = self.sentinel
+        r = self.h
+        counter = 0
+
+        while r >= 0:
+            while u.next[r] is not None:
+                counter += 1
+                if u.next[r].x < x:
+                    u = u.next[r]  # go right in list r
+                else:
+                    break
+
             r -= 1  # go down into list r-1
-        return u
+
+        return u, counter
