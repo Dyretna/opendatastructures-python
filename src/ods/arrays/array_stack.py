@@ -1,5 +1,7 @@
 from typing import Any
 
+from ..validation import Validator as Val
+
 
 class ArrayStack:
     def __init__(self):
@@ -25,14 +27,14 @@ class ArrayStack:
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         return self.a[i]
 
     def set(self, i: int, x: Any) -> Any:
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         y = self.a[i]
         self.a[i] = x
@@ -49,7 +51,7 @@ class ArrayStack:
     # -----------------------------------------------------
 
     def add(self, i: int, x: Any):
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
         if self.n == len(self.a):
             self._resize(max(4, len(self.a) * 2))
 
@@ -61,7 +63,7 @@ class ArrayStack:
         self.n += 1
 
     def remove(self, i: int):
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
         if self.is_empty():
             raise IndexError("remove from empty stack")
         x = self.a[i]
@@ -116,14 +118,6 @@ class ArrayStack:
     # ---------------------------------
     # internal helpers
     # ---------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
 
     def _new_capacity(self, extra):
         cap = max(1, self.capacity)

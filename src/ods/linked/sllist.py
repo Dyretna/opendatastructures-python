@@ -1,6 +1,8 @@
 import copy
 from typing import Any, Optional
 
+from ..validation import Validator as Val
+
 
 class Node:
     def __init__(self, x: Any):
@@ -38,16 +40,20 @@ class SLList:
         self.head: Optional[Node] = None
         self.tail: Optional[Node] = None
 
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i: int):
+        Val.validate_index_access(i, self.size)
         head = self.head
-        self._validate_index(i)
         head = self._traverse_steps(i)
 
         return head.x
 
     def set(self, i: int, x: Any) -> None:
+        Val.validate_index_access(i, self.size)
         head = self.head
-        self._validate_index(i)
         head = self._traverse_steps(i)
 
         head.x = x
@@ -76,7 +82,7 @@ class SLList:
         return True
 
     def add(self, i: int, x: Any) -> bool:
-        self._validate_index(i, adding=True)
+        Val.validate_index_insert(i, self.size)
 
         if self.n == 0 or i == 0:
             self.push(x)
@@ -108,7 +114,7 @@ class SLList:
         return x
 
     def remove(self, i: int) -> Any:
-        self._validate_index(i)
+        Val.validate_index_access(i, self.size)
         if self.n == 0:
             raise IndexError("Linked List it empty")
         elif i == 0:
@@ -151,17 +157,6 @@ class SLList:
 
         return head.x
 
-    def check_size(self):
-        head = self.head
-
-        i = 0
-        while head:
-            head = head.next
-            i += 1
-
-        if not i == self.n:
-            raise AssertionError("Size of n is not equal to number of Nodes")
-
     # --------------------------------------
     # Internal Helpers
     # --------------------------------------
@@ -176,15 +171,6 @@ class SLList:
 
     def _new_node(self, x: Any):
         return Node(x)
-
-    def _validate_index(self, i: int, adding: bool = False):
-        if adding:
-            bounds = self.n
-        else:
-            bounds = self.n - 1
-
-        if not 0 <= i <= bounds:
-            raise IndexError(f"Out of bounds: i={i}. Stay in range: 0 - {bounds}")
 
     def _get_next_item(self):
         b = copy.deepcopy(self)

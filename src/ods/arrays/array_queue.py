@@ -1,5 +1,7 @@
 from typing import Any
 
+from ..validation import Validator as Val
+
 
 class ArrayQueue:
     """
@@ -30,16 +32,16 @@ class ArrayQueue:
         return self.n == 0
 
     def get(self, i: int):
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
         if self.is_empty():
-            raise IndexError("empty... ")
+            raise IndexError("Queue is empty... ")
 
         return self.a[(i + self.j) % len(self.a)]
 
     def set(self, i: int, x: Any):
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
         if self.is_empty():
-            raise IndexError("empty... ")
+            raise IndexError("Queue is empty... ")
 
         y = self.a[(i + self.j) % len(self.a)]
         self.a[(i + self.j) % len(self.a)] = x
@@ -67,14 +69,6 @@ class ArrayQueue:
     # ---------------------------------
     # internal helpers
     # ---------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
 
     def _resize(self):
         b = [None] * max(1, 2 * self.n)

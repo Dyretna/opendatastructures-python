@@ -1,6 +1,8 @@
 import copy
 from typing import Any, Optional
 
+from ..validation import Validator as Val
+
 
 class Node:
     def __init__(self, x: Any):
@@ -42,16 +44,23 @@ class DLList:
         self.dummy.prev = self.dummy
         self.dummy.next = self.dummy
 
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i) -> Any:
+        Val.validate_index_access(i, self.size)
         return self._get_node(i).x
 
     def set(self, i: int, x: Any):
+        Val.validate_index_access(i, self.size)
         u = self._get_node(i)
         y = u.x
         u.x = x
         return y
 
     def add(self, i: int, x: Any):
+        Val.validate_index_insert(i, self.size)
         self._add_before(self._get_node(i), x)
 
     def append(self, node: Node):
@@ -71,6 +80,7 @@ class DLList:
         self.n += 1
 
     def remove(self, i: int) -> Any:
+        Val.validate_index_access(i, self.size)
         removed_node = self._remove_node(self._get_node(i))
         return removed_node.x
 

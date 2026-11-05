@@ -1,5 +1,6 @@
 from typing import Any
 
+from ...validation import Validator as Val
 from .base import ArrayDequeBase
 
 
@@ -45,14 +46,14 @@ class NoModDeque(ArrayDequeBase):
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         return self.a[(self.j + i) & (self.capacity - 1)]
 
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         idx = (self.j + i) & (self.capacity - 1)
 
@@ -61,7 +62,7 @@ class NoModDeque(ArrayDequeBase):
         return y
 
     def add(self, i: int, x: Any):
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         if self.n == self.capacity:
             self._resize_grow()
@@ -79,7 +80,7 @@ class NoModDeque(ArrayDequeBase):
 
     def add_all(self, i: int, c: list):
         """inserts elements of an iterable in order at index."""
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         m = len(c)
         if m == 0:
@@ -123,7 +124,7 @@ class NoModDeque(ArrayDequeBase):
     def remove(self, i: int):
         if self.is_empty():
             raise IndexError("pop from empty deque")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         x = self.a[(self.j + i) & (self.capacity - 1)]
 
@@ -158,14 +159,6 @@ class NoModDeque(ArrayDequeBase):
     # --------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
 
     def _resize_grow(self):
         new_capacity = self.capacity * 2

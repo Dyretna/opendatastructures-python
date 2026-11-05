@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from ..arrays import BoundedDeque
+from ..validation import Validator as Val
 
 
 class Node:
@@ -42,11 +43,17 @@ class SEList:
         self.dummy.prev = self.dummy
         self.dummy.next = self.dummy
 
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i: int):
+        Val.validate_index_access(i, self.size)
         u, j = self._get_location(i)
         return u.d.get(j)
 
     def set(self, i: int, x: Any):
+        Val.validate_index_access(i, self.size)
         u, j = self._get_location(i)
         return u.d.set(j, x)
 
@@ -58,6 +65,7 @@ class SEList:
         self.n += 1
 
     def add(self, i: int, x: Any):
+        Val.validate_index_insert(i, self.size)
         # if we add to end - simply append
         if i == self.n:
             self.append(x)
@@ -92,6 +100,7 @@ class SEList:
         self.n += 1
 
     def remove(self, i: int):
+        Val.validate_index_access(i, self.size)
         u, j = self._get_location(i)
         y = u.d.get(j)
         w = u

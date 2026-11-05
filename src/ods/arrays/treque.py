@@ -1,5 +1,6 @@
 from typing import Any
 
+from ..validation import Validator as Val
 from .array_deque import ArrayDeque
 
 
@@ -20,14 +21,14 @@ class Treque:
         return self.size == 0
 
     def get(self, i: int) -> Any:
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
         if i < self.front.size:
             return self.front.get(i)
         else:
             return self.back.get(i - self.front.size)
 
     def set(self, i: int, x: Any) -> None:
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
         if i < self.front.size:
             return self.front.set(i, x)
         else:
@@ -58,7 +59,7 @@ class Treque:
     # --------------------------------------------------------------
 
     def add(self, i: int, x: Any) -> None:
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         if i < self.front.size:
             self.front.add(i, x)
@@ -72,7 +73,7 @@ class Treque:
     def remove(self, i: int) -> Any:
         if self.is_empty():
             raise IndexError("Treque is empty")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         if i < self.front.size:
             x = self.front.remove(i)
@@ -88,14 +89,6 @@ class Treque:
     # --------------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
 
     def _balance_back(self):
         mid = self.size // 2

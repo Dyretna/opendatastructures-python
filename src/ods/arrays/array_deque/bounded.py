@@ -1,5 +1,6 @@
 from typing import Any, Optional
 
+from ...validation import Validator as Val
 from .original_with_additions import ArrayDeque
 
 
@@ -12,6 +13,7 @@ class BoundedDeque(ArrayDeque):
     def add(self, i: int, x: Any):
         if self.size == self.capacity:
             raise ValueError("Bounded Deque is full")
+        Val.validate_index_insert(i, self.size)
 
         if self.size == 0:
             self.a[self.j] = x

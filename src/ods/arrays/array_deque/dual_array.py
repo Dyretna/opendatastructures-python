@@ -1,5 +1,6 @@
 from typing import Any
 
+from ...validation import Validator as Val
 from ..array_stack import ArrayStack
 
 
@@ -39,7 +40,7 @@ class DualArrayDeque:
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         if i < self.front.size:
             return self.front.get(self.front.n - i - 1)
@@ -49,7 +50,7 @@ class DualArrayDeque:
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("empty... ")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         if i < self.front.size:
             return self.front.set(self.front.n - i - 1, x)
@@ -57,7 +58,7 @@ class DualArrayDeque:
             return self.back.set(i - self.front.n, x)
 
     def add(self, i: int, x: Any):
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         if i < self.front.n:
             self.front.add(self.front.n - i, x)
@@ -68,7 +69,7 @@ class DualArrayDeque:
     def remove(self, i: int) -> Any:
         if self.is_empty():
             raise IndexError("pop from empty deque")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         if i < self.front.n:
             x = self.front.remove(self.front.n - i - 1)
@@ -81,14 +82,6 @@ class DualArrayDeque:
     # ---------------------------------
     # internal helpers
     # ---------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
 
     def _balance(self):
         n = self.size
