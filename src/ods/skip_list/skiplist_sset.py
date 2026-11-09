@@ -13,6 +13,7 @@ class Node:
         self.h = h
         self.next = [None] * (h + 1)
 
+    @property
     def height(self):
         return self.h
 
@@ -81,7 +82,7 @@ class SkiplistSSet:
         w = self._new_node(x, self._pick_height())
 
         # 3. If new node is taller than current, extend stack
-        while self.h < w.height():
+        while self.h < w.height:
             self.h += 1
             self.sentinel.next.append(None)
             stack.append(self.sentinel)
@@ -142,7 +143,13 @@ class SkiplistSSet:
         return self.n
 
     def __str__(self):
-        pass
+        out = []
+        out.append(" SkiplistSSet ".center(50, "="))
+        out.append(f"items  : {self.to_list()}")
+        out.append(f"height : {self.h}")
+        out.append(f"size   : {self.n}")
+
+        return "\n".join(out)
 
     # --------------------------------------
     # Internal Helpers

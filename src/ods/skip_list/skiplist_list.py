@@ -1,6 +1,8 @@
 import random
 from typing import Optional
 
+from ..validation import Validator as Val
+
 
 class Node:
     """
@@ -30,10 +32,16 @@ class SkiplistList:
     # Morrins Interface
     # --------------------------------------
 
+    @property
+    def size(self):
+        return self.n
+
     def get(self, i: int):
+        Val.validate_index_access(i, self.size)
         return self._find_pred(i).next[0].x
 
     def set(self, i: int, x: int):
+        Val.validate_index_access(i, self.size)
         u = self._find_pred(i).next[0]
         y = u.x
         u.x = x
@@ -41,6 +49,7 @@ class SkiplistList:
 
     def add(self, i: int, x: int) -> bool:
         """Insert x at index i the skiplist."""
+        Val.validate_index_insert(i, self.size)
         w = self._new_node(x, self._pick_height())
 
         if w.height > self.h:
@@ -48,10 +57,10 @@ class SkiplistList:
             self.sentinel.next.append(None)
             self.sentinel.length.append(self.n + 1)
 
-        print("h =", self.h)
-        print("sentinel next =", len(self.sentinel.next))
-        print("sentinel length =", len(self.sentinel.length))
-        print("new node height =", w.height)
+        # print("h =", self.h)
+        # print("sentinel next =", len(self.sentinel.next))
+        # print("sentinel length =", len(self.sentinel.length))
+        # print("new node height =", w.height)
 
         self._add(i, w)
 
@@ -62,7 +71,7 @@ class SkiplistList:
         j = -1
 
         while r >= 0:
-            print("r =", r, "len(u.next) =", len(u.next), "node =", u.x)
+            # print("r =", r, "len(u.next) =", len(u.next), "node =", u.x)
 
             while u.next[r] is not None and j + u.length[r] < i:
                 j = j + u.length[r]
@@ -83,6 +92,7 @@ class SkiplistList:
 
     def remove(self, i: int) -> bool:
         """Remove from index i and return x from the skiplist."""
+        Val.validate_index_access(i, self.size)
         u = self.sentinel
         r = self.h
         j = -1
@@ -95,7 +105,7 @@ class SkiplistList:
             u.length[r] = u.length[r] - 1
             if j + u.length[r] + 1 == i and u.next[r] is not None:
                 x = u.next[r].x
-                u.length[r] = u.length[r] + u.next[r].length[r]
+                u.length[r] += u.next[r].length[r]  # absorb its span
                 u.next[r] = u.next[r].next[r]
                 if u == self.sentinel and u.next[r] is None:
                     self.h -= 1
@@ -129,7 +139,9 @@ class SkiplistList:
         out.append(" SkiplistList ".center(50, "="))
         out.append(f"items  : {self.to_list()}")
         out.append(f"height : {self.h}")
-        out.append(f"length : {self.n}")
+        out.append(f"size   : {self.n}")
+
+        return "\n".join(out)
 
     # --------------------------------------
     # Internal Helpers

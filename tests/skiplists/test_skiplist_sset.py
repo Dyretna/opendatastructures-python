@@ -2,12 +2,17 @@ import random
 
 import pytest
 
-from ods.skip_list.skiplist_sset import SkiplistSSet
+from ods.skip_list import SkiplistSSet, SkiplistSSetWithGet
+
+SSET_IMPLEMENTATIONS = [
+    SkiplistSSet,
+    SkiplistSSetWithGet,
+]
 
 
-@pytest.fixture
-def sl():
-    return SkiplistSSet()
+@pytest.fixture(params=SSET_IMPLEMENTATIONS)
+def sl(request):
+    return request.param()
 
 
 class TestConstruction:
@@ -122,8 +127,7 @@ class TestRemove:
 
 
 class TestRandomizedBehaviour:
-    def test_random_insertions_match_python_set(self):
-        sl = SkiplistSSet()
+    def test_random_insertions_match_python_set(self, sl):
         reference = set()
 
         values = list(range(100))
@@ -136,8 +140,7 @@ class TestRandomizedBehaviour:
         assert sl.to_list() == sorted(reference)
         assert len(sl) == len(reference)
 
-    def test_random_insertions_and_removals(self):
-        sl = SkiplistSSet()
+    def test_random_insertions_and_removals(self, sl):
         reference = set()
 
         values = list(range(100))
@@ -157,13 +160,11 @@ class TestRandomizedBehaviour:
 
 
 class TestheightHandling:
-    def test_height_growth_does_not_break_structure(self, monkeypatch):
+    def test_height_growth_does_not_break_structure(self, sl, monkeypatch):
         heights = iter([4, 3, 2, 1, 0])
 
         def fake_height():
             return next(heights)
-
-        sl = SkiplistSSet()
 
         monkeypatch.setattr(sl, "_pick_height", fake_height)
 
@@ -185,9 +186,7 @@ class TestSize:
             list(range(20)),
         ],
     )
-    def test_len_matches_number_of_elements(self, values):
-        sl = SkiplistSSet()
-
+    def test_len_matches_number_of_elements(self, sl, values):
         for v in values:
             sl.add(v)
 
