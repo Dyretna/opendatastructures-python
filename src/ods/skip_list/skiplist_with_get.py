@@ -20,7 +20,7 @@ class Node:
         return len(self.next) - 1
 
 
-class SkiplistSSetWithGet:
+class SkiplistWithGet:
     """
     A SkiplistSSet version that implements fast access to
     elements in O(log n) time with a get(i) method.

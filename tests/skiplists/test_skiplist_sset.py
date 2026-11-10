@@ -2,11 +2,12 @@ import random
 
 import pytest
 
-from ods.skip_list import SkiplistSSet, SkiplistSSetWithGet
+from ods.skip_list import SkiplistSSet, SkiplistWithFinger, SkiplistWithGet
 
 SSET_IMPLEMENTATIONS = [
     SkiplistSSet,
-    SkiplistSSetWithGet,
+    SkiplistWithGet,
+    SkiplistWithFinger,
 ]
 
 

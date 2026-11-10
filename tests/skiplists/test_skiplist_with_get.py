@@ -1,10 +1,10 @@
 import random
 
-from ods.skip_list import SkiplistSSetWithGet
+from ods.skip_list import SkiplistWithGet
 
 
 def test_random_ops_get_matches_reference():
-    sl = SkiplistSSetWithGet()
+    sl = SkiplistWithGet()
     reference = []
 
     for _ in range(500):
