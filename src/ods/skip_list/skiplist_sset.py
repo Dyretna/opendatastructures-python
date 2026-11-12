@@ -17,6 +17,18 @@ class Node:
     def height(self):
         return self.h
 
+    def __str__(self):
+        next_nodes = [
+            str(self.next[i].x) for i in range(self.height + 1) if self.next[i]
+        ]
+
+        out = [" SkiplistSSet Node ".center(50, "=")]
+        out.append(f"x      : {self.x} ")
+        out.append(f"height : {self.height}")
+        out.append(f"next   : {next_nodes}")
+
+        return "\n".join(out)
+
 
 class SkiplistSSet:
     """
