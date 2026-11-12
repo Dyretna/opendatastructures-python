@@ -3,18 +3,25 @@ import pytest
 from ods.skip_list.skiplist_list import SkiplistList
 
 
-class TestSkiplistListConstruction:
-    def test_new_list_is_empty(self):
-        sl = SkiplistList()
+@pytest.fixture
+def sl():
+    return SkiplistList()
 
+
+@pytest.fixture
+def flat_heights(monkeypatch):
+    """Force all node heights to 0 for deterministic structure tests."""
+    monkeypatch.setattr(SkiplistList, "_pick_height", lambda self: 0)
+
+
+class TestSkiplistListConstruction:
+    def test_new_list_is_empty(self, sl):
         assert len(sl) == 0
         assert sl.n == 0
         assert sl.h == 0
         assert sl.to_list() == []
 
-    def test_sentinel_initial_state(self):
-        sl = SkiplistList()
-
+    def test_sentinel_initial_state(self, sl):
         assert sl.sentinel.x is None
         assert sl.sentinel.height == 0
         assert sl.sentinel.next == [None]
@@ -31,12 +38,10 @@ class TestAdd:
             [10, 20, 30, 40, 50],
         ],
     )
-    def test_add_at_end(self, values, monkeypatch):
+    def test_add_at_end(self, sl, values, monkeypatch):
         # set all nodes to height 0
         # to make deterministic tests
         monkeypatch.setattr(SkiplistList, "_pick_height", lambda self: 0)
-
-        sl = SkiplistList()
 
         for i, value in enumerate(values):
             sl.add(i, value)
@@ -52,9 +57,7 @@ class TestAdd:
             ([7], [99, 7]),
         ],
     )
-    def test_add_at_front(self, values, expected):
-        sl = SkiplistList()
-
+    def test_add_at_front(self, sl, values, expected):
         for i, value in enumerate(values):
             sl.add(i, value)
 
@@ -70,14 +73,11 @@ class TestAdd:
             (3, 99, [1, 2, 3, 99]),
         ],
     )
-    def test_add_at_arbitrary_position(self, index, value, expected):
-        sl = SkiplistList()
-
+    def test_add_at_arbitrary_position(self, sl, index, value, expected):
         for i, x in enumerate([1, 2, 3]):
             sl.add(i, x)
 
         sl.add(index, value)
-
         assert sl.to_list() == expected
 
 
@@ -92,9 +92,7 @@ class TestGet:
             (4, 50),
         ],
     )
-    def test_get_returns_correct_value(self, index, expected):
-        sl = SkiplistList()
-
+    def test_get_returns_correct_value(self, sl, index, expected):
         for i, x in enumerate([10, 20, 30, 40, 50]):
             sl.add(i, x)
 
@@ -110,9 +108,7 @@ class TestSet:
             (2, 300, 30),
         ],
     )
-    def test_set_returns_old_value(self, index, new_value, old_value):
-        sl = SkiplistList()
-
+    def test_set_returns_old_value(self, sl, index, new_value, old_value):
         for i, x in enumerate([10, 20, 30]):
             sl.add(i, x)
 
@@ -126,9 +122,7 @@ class TestSet:
             (2, 300, [10, 20, 300]),
         ],
     )
-    def test_set_updates_value(self, index, new_value, expected):
-        sl = SkiplistList()
-
+    def test_set_updates_value(self, sl, index, new_value, expected):
         for i, x in enumerate([10, 20, 30]):
             sl.add(i, x)
 
@@ -147,9 +141,7 @@ class TestRemove:
             (3, 40, [10, 20, 30]),
         ],
     )
-    def test_remove(self, remove_index, expected_removed, expected_list):
-        sl = SkiplistList()
-
+    def test_remove(self, sl, remove_index, expected_removed, expected_list):
         for i, x in enumerate([10, 20, 30, 40]):
             sl.add(i, x)
 
@@ -161,9 +153,7 @@ class TestRemove:
 
 
 class TestSequenceOperations:
-    def test_add_get_set_remove_sequence(self):
-        sl = SkiplistList()
-
+    def test_add_get_set_remove_sequence(self, sl):
         sl.add(0, 10)
         sl.add(1, 20)
         sl.add(2, 30)
@@ -182,8 +172,7 @@ class TestSequenceOperations:
         assert removed == 99
         assert sl.to_list() == [10, 30]
 
-    def test_matches_python_list_behavior(self):
-        sl = SkiplistList()
+    def test_matches_python_list_behavior(self, sl):
         expected = []
 
         for value in [10, 20, 30, 40, 50]:
@@ -200,25 +189,19 @@ class TestSequenceOperations:
 
 
 class TestInternalInvariants:
-    def test_n_matches_number_of_items(self):
-        sl = SkiplistList()
-
+    def test_n_matches_number_of_items(self, sl):
         for i in range(10):
             sl.add(i, i)
 
         assert sl.n == len(sl.to_list())
 
-    def test_height_never_exceeds_sentinel_height(self):
-        sl = SkiplistList()
-
+    def test_height_never_exceeds_sentinel_height(self, sl):
         for i in range(100):
             sl.add(i, i)
 
         assert sl.h <= sl.sentinel.height
 
-    def test_sentinel_arrays_have_same_length(self):
-        sl = SkiplistList()
-
+    def test_sentinel_arrays_have_same_length(self, sl):
         for i in range(100):
             sl.add(i, i)
 

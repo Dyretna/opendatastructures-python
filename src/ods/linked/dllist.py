@@ -146,6 +146,7 @@ class DLList:
         self.dummy = self._add_before(head, None)
 
     def truncate(self, i: int) -> "DLList":
+        Val.validate_index_access(i, self.size)
         t_node = self._get_node(i)
         new_dummy = self._add_before(t_node, None)
 
