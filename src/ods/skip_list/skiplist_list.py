@@ -122,7 +122,7 @@ class SkiplistList:
                 j = j + u.length[r]
                 u = u.next[r]
 
-            u.length[r] = u.length[r] - 1
+            u.length[r] -= 1
             if j + u.length[r] + 1 == i and u.next[r] is not None:
                 x = u.next[r].x
                 u.length[r] += u.next[r].length[r]  # absorb its span
@@ -139,8 +139,64 @@ class SkiplistList:
     # Additional Public Utilities
     # --------------------------------------
 
-    def absorb(self, skiplist: "SkiplistList") -> None:
-        pass
+    def absorb(self, l2: "SkiplistList") -> None:
+        """
+        absorb(l2), takes as an argument a SkiplistList, l2, empties
+        it and appends its contents, in order, to the receiver.
+
+        For example, if l1 contains a, b, c and l2 contains d, e, f,
+        then after calling l1 .absorb(l2), l1 will contain a, b, c,
+        d, e, f and l2 will be empty.
+
+        This method runs in O(log n) time.
+
+        """
+
+        # consolidate heights for indexing on level r
+        while l2.h > self.h:
+            self.h += 1
+            if len(self.sentinel.next) - 1 < self.h:
+                self.sentinel.next.append(None)
+                self.sentinel.length.append(self.n + 1)
+        while self.h > l2.h:
+            l2.h += 1
+            if len(l2.sentinel.next) - 1 < l2.h:
+                l2.sentinel.next.append(None)
+                l2.sentinel.length.append(l2.n + 1)
+
+        u = self.sentinel
+        r = self.h
+
+        while r >= 0:
+            # traverse to last node at level r
+            while u.next[r] is not None:
+                u = u.next[r]
+
+            # CONNECTED LEVEL: connect nodes at seam and set heights
+            if l2.sentinel.next[r] is not None:
+                u.next[r] = l2.sentinel.next[r]
+                if r == 0:
+                    # LEVEL 0: terminal edge = 0,
+                    # the seam will always span one index.
+                    u.length[r] += 1
+                else:
+                    # LEVEL >= 1: terminal edge = n - idx(u).
+                    # l2.sentinel.length[r] counts from index -1,
+                    # so it's idx2 + 1 -- subtract the sentinel's
+                    # own step to get the real index distance.
+                    u.length[r] += l2.sentinel.length[r] - 1
+
+            # DEAD LEVEL: skip connect and increment
+            # last node (or sentinel) with l2 size
+            else:
+                u.length[r] += l2.size
+
+            r -= 1
+
+        self.n += l2.n
+        l2.sentinel = Node(None, 0)
+        l2.h = 0
+        l2.n = 0
 
     def truncate(self, i: int) -> "SkiplistList":
         """
@@ -176,7 +232,7 @@ class SkiplistList:
         while r >= 0:
             # same traversal as in _find_pred()
             while u.next[r] is not None and j + u.length[r] < i:
-                j = j + u.length[r]  # jump u index by length
+                j += u.length[r]  # increment index by length at level
                 u = u.next[r]
 
             # if u.next[r] exists here, its index is >= i, so it belongs
@@ -201,7 +257,8 @@ class SkiplistList:
         while len(tail.sentinel.next) - 1 > tail_h:
             tail.sentinel.next.pop()
             tail.sentinel.length.pop()
-        # Drop now-empty top levels of self
+
+        # Drop now-empty top levels of self except last
         while self.h > 0 and self.sentinel.next[self.h] is None:
             self.h -= 1
 
@@ -228,6 +285,22 @@ class SkiplistList:
         out.append(f"items  : {self.to_list()}")
         out.append(f"height : {self.h}")
         out.append(f"size   : {self.n}")
+
+        out.append(" - Structure - ".center(50, " "))
+        out.append(
+            f"Sen ::::::||{''.join(['#' for _ in range(len(self.sentinel.next))])}"
+        )
+
+        u = self.sentinel.next[0]
+        i = 0
+
+        for i in range(self.n + 1):
+            if u is not None:
+                out.append(
+                    f"i={i:<2}::x={u.x:<2}||"
+                    f"{''.join(['#' for _ in range(len(u.next))])}"
+                )
+                u = u.next[0]
 
         return "\n".join(out)
 
