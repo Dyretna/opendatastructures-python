@@ -39,14 +39,14 @@ class SELDeque:
 
     def add_first(self, x: Any):
         first = self.dummy.next
-        if first == self.dummy or first.d.size() == self.b:
+        if first == self.dummy or first.d.size == self.b:
             first = self._add_before(self.dummy.next)
         first.d.add_first(x)
         self.n += 1
 
     def add_last(self, x: Any):
         last = self.dummy.prev
-        if last == self.dummy or last.d.size() == self.b:
+        if last == self.dummy or last.d.size == self.b:
             last = self._add_before(self.dummy)
         last.d.add_last(x)
         self.n += 1
@@ -57,8 +57,8 @@ class SELDeque:
         if first is self.dummy:
             raise Exception("SEL is empty")
 
-        x = first.d.pop_first()
-        if first.d.size() == 0:
+        x = first.d.remove_first()
+        if first.d.size == 0:
             self._remove_node(first)
 
         self.n -= 1
@@ -70,8 +70,8 @@ class SELDeque:
         if last is self.dummy:
             raise Exception("SEL is empty")
 
-        x = last.d.pop_last()
-        if last.d.size() == 0:
+        x = last.d.remove_last()
+        if last.d.size == 0:
             self._remove_node(last)
 
         self.n -= 1

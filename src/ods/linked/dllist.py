@@ -1,5 +1,5 @@
 import copy
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 from ..validation import Validator as Val
 
@@ -9,12 +9,6 @@ class Node:
         self.x = x
         self.prev: Optional[Node] = None
         self.next: Optional[Node] = None
-
-    def reverse(self):
-        pass
-
-
-# ------------------------------------------
 
 
 class DLList:
@@ -38,11 +32,12 @@ class DLList:
 
     """
 
-    def __init__(self):
+    def __init__(self, array: Optional[Iterable] = None):
         self.n = 0
         self.dummy = Node(None)
         self.dummy.prev = self.dummy
         self.dummy.next = self.dummy
+        self.add_all(0, array)
 
     @property
     def size(self):
@@ -84,9 +79,16 @@ class DLList:
         removed_node = self._remove_node(self._get_node(i))
         return removed_node.x
 
-    # -----------------------------------------------
-    # special methods
-    # ----------------------------------------------
+    # --------------------------------------
+    # Additional Public Utilities
+    # --------------------------------------
+
+    def add_all(self, i: int, array: Iterable):
+        if not array:
+            return None
+
+        for j, x in enumerate(array):
+            self.add(i + j, x)
 
     def create_from_nodes(self, n: int, start_node: Node) -> "DLList":
         """

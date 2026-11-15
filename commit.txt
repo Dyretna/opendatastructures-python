@@ -1,0 +1,16 @@
+ADD: improvements on LL implementations and a testsuite for SLList.
+
+- improved on SLList interface
+        - add_first(x), add_last(x), remove_first(), remove_last(),
+        - said interfaces + push(x) and pop() utilise add(i, x) and remove(i)
+        - add_all(), which takes an iterable. Optionally used in init.
+        - to_list(), returns a list of all elements
+        - __iter__(), correctly renamed _get_next_item()
+        - check_size(), raises AssertionError if
+
+- testsuite for single linked list
+- also an add_all() for DLList
+- fixes in SELDeque(), using correct interface from Bdeque()
+- Some improvements in linked list notebooks, for cleaner
+  build of test classes due to new methods, but no effective work
+  on exercises.

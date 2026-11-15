@@ -1,5 +1,4 @@
-import copy
-from typing import Any, Optional
+from typing import Any, Iterable, Optional
 
 from ..validation import Validator as Val
 
@@ -8,9 +7,6 @@ class Node:
     def __init__(self, x: Any):
         self.x = x
         self.next: Optional[Node] = None
-
-
-# ------------------------------------------
 
 
 class SLList:
@@ -35,10 +31,11 @@ class SLList:
     to w is by traversing the SLList starting at head and taking n - 2 steps.
     """
 
-    def __init__(self):
+    def __init__(self, array: Optional[Iterable] = None):
         self.n = 0
         self.head: Optional[Node] = None
         self.tail: Optional[Node] = None
+        self.add_all(0, array)
 
     @property
     def size(self):
@@ -58,75 +55,101 @@ class SLList:
 
         head.x = x
 
-    def push(self, x: Any) -> Any:
-        u = self._new_node(x)
-        u.next = self.head
-        self.head = u
-
-        if self.n == 0:
-            self.tail = u
-
-        self.n += 1
-        return x
-
-    def append(self, x: Any) -> bool:
-        u = self._new_node(x)
-        if self.n == 0:
-            self.head = u
-        else:
-            self.tail.next = u
-
-        self.tail = u
-        self.n += 1
-
-        return True
-
-    def add(self, i: int, x: Any) -> bool:
+    def add(self, i: int, x: Any) -> Any:
         Val.validate_index_insert(i, self.size)
 
-        if self.n == 0 or i == 0:
-            self.push(x)
-            return True
-
-        if i == self.n:
-            self.append(x)
-            return True
-
         u = self._new_node(x)
-        head = self._traverse_steps(i - 1)
-        u.next = head.next
-        head.next = u
+
+        # push / add_first
+        if i == 0:
+            u.next = self.head
+            self.head = u
+            if self.n == 0:
+                self.tail = u
+
+        # add_last
+        elif i == self.n:
+            self.tail.next = u
+            self.tail = u
+
+        else:
+            head = self._traverse_steps(i - 1)
+            u.next = head.next
+            head.next = u
 
         self.n += 1
-        return True
-
-    def pop(self) -> Any:
-        if self.n == 0:
-            return None
-        x = self.head.x
-
-        self.head = self.head.next
-        self.n -= 1
-
-        if self.n == 0:
-            self.tail = None
-
         return x
 
     def remove(self, i: int) -> Any:
-        Val.validate_index_access(i, self.size)
         if self.n == 0:
-            raise IndexError("Linked List it empty")
-        elif i == 0:
-            return self.pop()
+            return None
+
+        Val.validate_index_access(i, self.size)
+
+        # remove first
+        if i == 0:
+            x = self.head.x
+            self.head = self.head.next
+            if self.n == 1:
+                self.tail = None
+
+        # pop / remove last
+        elif i == self.n - 1:
+            head = self._traverse_steps(i - 1)
+            x = head.next.x
+            head.next = None
+            self.tail = head
+
         else:
             head = self._traverse_steps(i - 1)
+            x = head.next.x
+            head.next = head.next.next
 
-        x = head.next.x
-        head.next = head.next.next
         self.n -= 1
-
         return x
+
+    def push(self, x: Any) -> Any:
+        return self.add(0, x)
+
+    def add_first(self, x: Any) -> Any:
+        return self.add(0, x)
+
+    def add_last(self, x: Any) -> Any:
+        return self.add(self.n, x)
+
+    def pop(self) -> Any:
+        return self.remove(0)
+
+    def remove_first(self) -> Any:
+        return self.remove(0)
+
+    def remove_last(self) -> Any:
+        return self.remove(self.n - 1)
+
+    # --------------------------------------
+    # Additional Public Utilities
+    # --------------------------------------
+
+    def add_all(self, i: int, array: Iterable):
+        if not array:
+            return None
+
+        for j, x in enumerate(array):
+            self.add(i + j, x)
+
+    def check_size(self) -> None:
+        """Raises AssertionError"""
+        head = self.head
+
+        i = 0
+        while head is not None:
+            head = head.next
+            i += 1
+
+        if not i == self.n:
+            raise AssertionError(
+                f"Size of n: {self.n} is not equal to number of Nodes: {i}"
+            )
 
     def reverse(self) -> None:
         current = self.head
@@ -157,6 +180,29 @@ class SLList:
 
         return head.x
 
+    def to_list(self):
+        return [x for x in list(iter(self))]
+
+    def __iter__(self):
+        node = self.head
+        while node is not None:
+            yield node.x
+            node = node.next
+
+    def __str__(self):
+        header = "\n" + " Single Linked List ".center(50, "=")
+        n = f"n : {self.n}"
+        if self.n == 0:
+            return header + "\nEmpty..."
+
+        gen = iter(self)
+        head_str = f"HEAD: {next(gen)}"
+        nodes = [str(x) for x in list(gen)]
+        nodes_str = "node: " + "\nnode: ".join(nodes[:-1])
+        tail_str = f"TAIL: {self.tail.x}"
+
+        return "\n" + "\n".join([header, n, head_str, nodes_str, tail_str])
+
     # --------------------------------------
     # Internal Helpers
     # --------------------------------------
@@ -171,25 +217,3 @@ class SLList:
 
     def _new_node(self, x: Any):
         return Node(x)
-
-    def _get_next_item(self):
-        b = copy.deepcopy(self)
-
-        while b.head:
-            yield str(b.head.x)
-
-            b.head = b.head.next
-
-    def __str__(self):
-        header = "\n" + " Single Linked List ".center(50, "=")
-        n = f"n : {self.n}"
-        if self.n == 0:
-            return header + "\nEmpty..."
-
-        gen = self._get_next_item()
-        head_str = f"HEAD: {next(gen)}"
-        nodes = [x for x in list(gen)]
-        nodes_str = "node: " + "\nnode: ".join(nodes[:-1])
-        tail_str = f"TAIL: {self.tail.x}"
-
-        return "\n" + "\n".join([header, n, head_str, nodes_str, tail_str])
