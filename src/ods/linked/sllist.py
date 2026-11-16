@@ -181,13 +181,16 @@ class SLList:
         return head.x
 
     def to_list(self):
-        return [x for x in list(iter(self))]
+        return list(iter(self))
 
     def __iter__(self):
         node = self.head
         while node is not None:
             yield node.x
             node = node.next
+
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.to_list()})"
 
     def __str__(self):
         header = "\n" + " Single Linked List ".center(50, "=")

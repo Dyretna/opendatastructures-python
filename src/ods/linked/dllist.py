@@ -1,4 +1,3 @@
-import copy
 from typing import Any, Iterable, Optional
 
 from ..validation import Validator as Val
@@ -43,6 +42,9 @@ class DLList:
     def size(self):
         return self.n
 
+    def is_empty(self):
+        return self.n == 0
+
     def get(self, i) -> Any:
         Val.validate_index_access(i, self.size)
         return self._get_node(i).x
@@ -57,22 +59,6 @@ class DLList:
     def add(self, i: int, x: Any):
         Val.validate_index_insert(i, self.size)
         self._add_before(self._get_node(i), x)
-
-    def append(self, node: Node):
-        if not isinstance(node, Node):
-            raise TypeError("Argument must of Node type (DLL)")
-        if self.n == 0:
-            self.dummy.next = node
-            self.dummy.prev = node
-            node.next = self.dummy
-            node.prev = self.dummy
-        else:
-            last_n = self.dummy.prev
-            last_n.next = node
-            node.next = self.dummy
-            self.dummy.prev = node
-
-        self.n += 1
 
     def remove(self, i: int) -> Any:
         Val.validate_index_access(i, self.size)
@@ -89,6 +75,20 @@ class DLList:
 
         for j, x in enumerate(array):
             self.add(i + j, x)
+
+    def check_size(self) -> None:
+        """Raises AssertionError"""
+        head = self.dummy.next
+
+        i = 0
+        while head != self.dummy:
+            head = head.next
+            i += 1
+
+        if not i == self.n:
+            raise AssertionError(
+                f"Size of n: {self.n} is not equal to number of Nodes: {i}"
+            )
 
     def create_from_nodes(self, n: int, start_node: Node) -> "DLList":
         """
@@ -109,19 +109,16 @@ class DLList:
 
         return new_inst
 
-    def check_size(self) -> None:
-        """Raises AssertionError"""
-        head = self.dummy.next
+    def deal(self) -> "DLList":
+        new_dll = DLList()
+        head = self.dummy.next.next
 
-        i = 0
-        while head != self.dummy:
-            head = head.next
-            i += 1
+        while head != self.dummy and head.prev != self.dummy:
+            nxt = head.next.next
+            new_dll._append(self._remove_node(head))
+            head = nxt
 
-        if not i == self.n:
-            raise AssertionError(
-                f"Size of n: {self.n} is not equal to number of Nodes: {i}"
-            )
+        return new_dll
 
     def is_palindrome(self) -> bool:
         head = self.dummy.next
@@ -135,17 +132,32 @@ class DLList:
 
         return True
 
+    def reverse(self):
+        if self.n <= 1:
+            return
+
+        current = self.dummy.next
+
+        while current != self.dummy:
+            next_temp = current.next
+            current.next = current.prev
+            current.prev = next_temp
+            current = next_temp
+
+        self.dummy.next, self.dummy.prev = self.dummy.prev, self.dummy.next
+
     def rotate(self, r: int):
         if r == 0:
             return
-        elif r > 0:
-            i = r
-        else:
-            i = self.n + r
+
+        i = r % self.n
         head = self._get_node(i)
 
         self._remove_node(self.dummy)
         self.dummy = self._add_before(head, None)
+
+    def to_list(self):
+        return list(iter(self))
 
     def truncate(self, i: int) -> "DLList":
         Val.validate_index_access(i, self.size)
@@ -167,44 +179,66 @@ class DLList:
 
         return self.create_from_nodes(old_n - i - 1, new_dummy)
 
-    def deal(self) -> "DLList":
-        new_dll = DLList()
-        head = self.dummy.next.next
+    def __iter__(self) -> Any:
+        head = self.dummy.next
 
-        while head != self.dummy and head.prev != self.dummy:
-            nxt = head.next.next
-            new_dll.append(self._remove_node(head))
-            head = nxt
+        for _ in range(self.n):
+            yield head.x
 
-        return new_dll
+            head = head.next
 
-    def reverse(self):
-        if self.n <= 1:
-            return
+    def __repr__(self):
+        return f"{self.__class__.__name__}({self.to_list()})"
 
-        current = self.dummy.next
+    def __str__(self) -> str:
+        header = "\n" + " Double Linked List ".center(50, "=")
+        n = f"n : {self.n}"
 
-        while current != self.dummy:
-            next_temp = current.next
-            current.next = current.prev
-            current.prev = next_temp
-            current = next_temp
+        if self.n == 0:
+            return header + "\nEmpty..."
 
-        self.dummy.next, self.dummy.prev = self.dummy.prev, self.dummy.next
+        nodes = [str(item) for item in list(iter(self))]
+        nodes_str = "node: " + "\nnode: ".join(nodes)
+
+        return "\n".join([header, n, nodes_str])
 
     # -------------------------------------------------
-    # Merge-sort methods...
+    # Merge-sort methods, under construction...
     # -------------------------------------------------
 
     def absorb(self, l2: "DLList"):
-        while l2.n:
-            self.take_first(l2)
-
-    def take_first(self, l2: "DLList"):
-        if l2.n == 0:
+        """Absorbs a DLList in constant time (no iteration)."""
+        if l2.is_empty():
+            # or return None?
             raise IndexError("DLL l2 cannot be empty")
 
-        self.append(l2._remove_node(l2.dummy.next))
+        # set n first, to account for
+        # both if self is empty or not.
+        self.n += l2.n
+        l2.n = 0
+
+        if self.is_empty():
+            self.dummy, l2.dummy = l2.dummy, self.dummy
+            return
+
+        # connect last l1 node and first l2 node both ways
+        self.dummy.prev.next = l2.dummy.next
+        l2.dummy.next.prev = self.dummy.prev
+
+        # connect dummy and last l2 node both ways
+        self.dummy.prev = l2.dummy.prev
+        l2.dummy.prev.next = self.dummy
+
+        # disconnect and reset l2.
+        l2.dummy.prev = l2.dummy
+        l2.dummy.next = l2.dummy
+
+    def take_first(self, l2: "DLList"):
+        if l2.is_empty():
+            # or return None?
+            raise IndexError("DLL l2 cannot be empty")
+
+        self._append(l2._remove_node(l2.dummy.next))
 
     @staticmethod
     def merge(l1: "DLList", l2: "DLList") -> "DLList":
@@ -243,6 +277,22 @@ class DLList:
     # Internal Helpers
     # --------------------------------------
 
+    def _append(self, node: Node):
+        if not isinstance(node, Node):
+            raise TypeError("Argument must be a DLList.Node")
+        if self.n == 0:
+            self.dummy.next = node
+            self.dummy.prev = node
+            node.next = self.dummy
+            node.prev = self.dummy
+        else:
+            last_n = self.dummy.prev
+            last_n.next = node
+            node.next = self.dummy
+            self.dummy.prev = node
+
+        self.n += 1
+
     def _get_node(self, i: int) -> Node:
         if i < self.n // 2:
             p = self.dummy.next
@@ -272,25 +322,3 @@ class DLList:
 
     def _new_node(self, x: Any) -> Node:
         return Node(x)
-
-    def _get_next_item(self) -> Any:
-        b = copy.deepcopy(self)
-        head = b.dummy.next
-
-        for _ in range(self.n):
-            yield head.x
-
-            head = head.next
-
-    def __str__(self) -> str:
-        header = "\n" + " Double Linked List ".center(50, "=")
-        n = f"n : {self.n}"
-
-        if self.n == 0:
-            return header + "\nEmpty..."
-
-        gen = self._get_next_item()
-        nodes = [str(item) for item in list(gen)]
-        nodes_str = "node: " + "\nnode: ".join(nodes)
-
-        return "\n".join([header, n, nodes_str])

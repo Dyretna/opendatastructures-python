@@ -17,7 +17,7 @@ class SELDeque:
     """
     Version of an SEList that supports all the Deque operations
     in constant amortized time per operation, independent of
-    the value of b.
+    the value of b, but cannot support index operations.
 
     """
 
@@ -51,7 +51,7 @@ class SELDeque:
         last.d.add_last(x)
         self.n += 1
 
-    def pop_first(self) -> Any:
+    def remove_first(self) -> Any:
         first = self.dummy.next
 
         if first is self.dummy:
@@ -64,7 +64,7 @@ class SELDeque:
         self.n -= 1
         return x
 
-    def pop_last(self) -> Any:
+    def remove_last(self) -> Any:
         last = self.dummy.prev
 
         if last is self.dummy:
