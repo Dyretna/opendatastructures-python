@@ -1,9 +1,10 @@
 from typing import Any
 
+from ..base import BaseCollection
 from ..validation import Validator as Val
 
 
-class ArrayQueue:
+class ArrayQueue(BaseCollection):
     """
     We use modulus on the length of array, which makes it circular
     in order to simulate an infinite array. var 'j' keeps track of
@@ -15,21 +16,9 @@ class ArrayQueue:
         self.j = 0  # keeps track of next element to remove
         self.n = 0
 
-    # ------------------------------------------------------
-    # Abstract interface requirements
-    # + convenience methods and properties
-    # ------------------------------------------------------
-
-    @property
-    def size(self):
-        return self.n
-
     @property
     def capacity(self):
         return len(self.a)
-
-    def is_empty(self):
-        return self.n == 0
 
     def get(self, i: int):
         Val.validate_index_access(i, self.size)
@@ -66,6 +55,13 @@ class ArrayQueue:
             self._resize()
         return x
 
+    def __str__(self):
+        out = [f" {__class__.__name__} ".center(50, "=")]
+        out.append(f"{self.a}")
+        out.append(f"n: {self.n}, j: {self.j}")
+
+        return "\n".join(out)
+
     # ---------------------------------
     # internal helpers
     # ---------------------------------
@@ -76,10 +72,3 @@ class ArrayQueue:
             b[k] = self.a[(self.j + k) % len(self.a)]
         self.a = b
         self.j = 0
-
-    def __str__(self):
-        out = [f" {__class__.__name__} ".center(50, "=")]
-        out.append(f"{self.a}")
-        out.append(f"n: {self.n}, j: {self.j}")
-
-        return "\n".join(out)

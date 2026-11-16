@@ -1,5 +1,6 @@
 from typing import Any, Iterable, Optional
 
+from ..base import BaseList
 from ..validation import Validator as Val
 
 
@@ -9,7 +10,7 @@ class Node:
         self.next: Optional[Node] = None
 
 
-class SLList:
+class SLList(BaseList):
     """
     Attributes
     ----------
@@ -37,10 +38,6 @@ class SLList:
         self.tail: Optional[Node] = None
         self.add_all(0, array)
 
-    @property
-    def size(self):
-        return self.n
-
     def get(self, i: int):
         Val.validate_index_access(i, self.size)
         head = self.head
@@ -52,8 +49,10 @@ class SLList:
         Val.validate_index_access(i, self.size)
         head = self.head
         head = self._traverse_steps(i)
-
+        y = head.x
         head.x = x
+
+        return y
 
     def add(self, i: int, x: Any) -> Any:
         Val.validate_index_insert(i, self.size)
@@ -82,8 +81,7 @@ class SLList:
 
     def remove(self, i: int) -> Any:
         if self.n == 0:
-            return None
-
+            raise IndexError("List is empty")
         Val.validate_index_access(i, self.size)
 
         # remove first
@@ -109,22 +107,28 @@ class SLList:
         return x
 
     def push(self, x: Any) -> Any:
-        return self.add(0, x)
+        u = self._new_node(x)
+        u.next = self.head
+        self.head = u
 
-    def add_first(self, x: Any) -> Any:
-        return self.add(0, x)
+        if self.n == 0:
+            self.tail = u
 
-    def add_last(self, x: Any) -> Any:
-        return self.add(self.n, x)
+        self.n += 1
+        return x
 
     def pop(self) -> Any:
-        return self.remove(0)
+        if self.n == 0:
+            return None
+        x = self.head.x
 
-    def remove_first(self) -> Any:
-        return self.remove(0)
+        self.head = self.head.next
+        self.n -= 1
 
-    def remove_last(self) -> Any:
-        return self.remove(self.n - 1)
+        if self.n == 0:
+            self.tail = None
+
+        return x
 
     # --------------------------------------
     # Additional Public Utilities
@@ -179,9 +183,6 @@ class SLList:
             head = head.next
 
         return head.x
-
-    def to_list(self):
-        return list(iter(self))
 
     def __iter__(self):
         node = self.head

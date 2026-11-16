@@ -1,9 +1,10 @@
 from typing import Any
 
+from ...base import BaseList
 from ...validation import Validator as Val
 
 
-class OrderedDeque:
+class OrderedDeque(BaseList):
     """
     We create an deque without a circular buffer, and
     instead add from middle towards both ends. when any end is
@@ -27,27 +28,20 @@ class OrderedDeque:
     # ------------------------------------------------------
 
     @property
-    def size(self):
-        return self.n
-
-    @property
     def capacity(self):
         return len(self.a)
-
-    def is_empty(self):
-        return self.n == 0
 
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("empty... ")
-        Val.validate_index_access(self.size)
+        Val.validate_index_access(i, self.size)
 
         return self.a[self.block_start + i]
 
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("empty... ")
-        Val.validate_index_access(self.size)
+        Val.validate_index_access(i, self.size)
 
         y = self.a[self.block_start + i]
         self.a[self.block_start + i] = x
@@ -111,6 +105,15 @@ class OrderedDeque:
 
         return x
 
+    def __str__(self):
+        out = [" ArrayDequeOrdered ".center(50, "=")]
+        out.append(f"a: {self.a}")
+        out.append(f"Capacity       : {self.capacity}")
+        out.append(f"Size           : {self.size}")
+        out.append(f"Block Start    : {self.block_start}")
+        out.append(f"Block End      : {self.block_end}")
+        return "\n" + "\n".join(out)
+
     # --------------------------------------------------------
     # Internal Helpers
     # --------------------------------------------------------
@@ -133,12 +136,3 @@ class OrderedDeque:
         # since they step inside add before adding.
         self.block_start = self.capacity // 2 - 1
         self.block_end = self.block_start
-
-    def __str__(self):
-        out = [" ArrayDequeOrdered ".center(50, "=")]
-        out.append(f"a: {self.a}")
-        out.append(f"Capacity       : {self.capacity}")
-        out.append(f"Size           : {self.size}")
-        out.append(f"Block Start    : {self.block_start}")
-        out.append(f"Block End      : {self.block_end}")
-        return "\n" + "\n".join(out)

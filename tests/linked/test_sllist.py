@@ -219,11 +219,13 @@ class TestAddRemoveGeneral:
         with pytest.raises(IndexError):
             three.add(4, "x")
 
-    def test_remove_empty_returns_none(self, empty):
-        assert empty.remove(0) is None
+    def test_remove_empty_raises(self, empty):
+        with pytest.raises(IndexError):
+            assert empty.remove(0)
 
-    def test_remove_last_empty_returns_none(self, empty):
-        assert empty.remove_last() is None
+    def test_remove_last_empty_raises(self, empty):
+        with pytest.raises(IndexError):
+            assert empty.remove_last()
 
     def test_repeated_removes_leave_consistent_state(self, five):
         for _ in range(5):

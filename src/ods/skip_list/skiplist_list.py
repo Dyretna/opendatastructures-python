@@ -1,6 +1,7 @@
 import random
 from typing import Optional
 
+from ..base import BaseList
 from ..validation import Validator as Val
 
 
@@ -33,7 +34,7 @@ class Node:
         return "\n".join(out)
 
 
-class SkiplistList:
+class SkiplistList(BaseList):
     """
     A SkiplistList implements the List interface using a skiplist
     structure. In a SkiplistList, L0 contains the elements of the
@@ -265,19 +266,13 @@ class SkiplistList:
         return tail
 
     def to_list(self) -> list[int]:
-        """Convert to list (for debugging / testing)."""
+        """Overriding Baselist version."""
         result = []
         u = self.sentinel.next[0]
         while u is not None:
             result.append(u.x)
             u = u.next[0]
         return result
-
-    def __contains__(self, x: int):
-        return self.find(x) == x
-
-    def __len__(self) -> int:
-        return self.n
 
     def __str__(self):
         out = []

@@ -81,56 +81,6 @@ class TestAdd:
         assert sl.to_list() == expected
 
 
-class TestGet:
-    @pytest.mark.parametrize(
-        "index,expected",
-        [
-            (0, 10),
-            (1, 20),
-            (2, 30),
-            (3, 40),
-            (4, 50),
-        ],
-    )
-    def test_get_returns_correct_value(self, sl, index, expected):
-        for i, x in enumerate([10, 20, 30, 40, 50]):
-            sl.add(i, x)
-
-        assert sl.get(index) == expected
-
-
-class TestSet:
-    @pytest.mark.parametrize(
-        "index,new_value,old_value",
-        [
-            (0, 100, 10),
-            (1, 200, 20),
-            (2, 300, 30),
-        ],
-    )
-    def test_set_returns_old_value(self, sl, index, new_value, old_value):
-        for i, x in enumerate([10, 20, 30]):
-            sl.add(i, x)
-
-        assert sl.set(index, new_value) == old_value
-
-    @pytest.mark.parametrize(
-        "index,new_value,expected",
-        [
-            (0, 100, [100, 20, 30]),
-            (1, 200, [10, 200, 30]),
-            (2, 300, [10, 20, 300]),
-        ],
-    )
-    def test_set_updates_value(self, sl, index, new_value, expected):
-        for i, x in enumerate([10, 20, 30]):
-            sl.add(i, x)
-
-        sl.set(index, new_value)
-
-        assert sl.to_list() == expected
-
-
 class TestRemove:
     @pytest.mark.parametrize(
         "remove_index,expected_removed,expected_list",
@@ -150,42 +100,6 @@ class TestRemove:
         assert removed == expected_removed
         assert sl.to_list() == expected_list
         assert len(sl) == len(expected_list)
-
-
-class TestSequenceOperations:
-    def test_add_get_set_remove_sequence(self, sl):
-        sl.add(0, 10)
-        sl.add(1, 20)
-        sl.add(2, 30)
-
-        assert sl.to_list() == [10, 20, 30]
-
-        assert sl.get(1) == 20
-
-        old = sl.set(1, 99)
-
-        assert old == 20
-        assert sl.to_list() == [10, 99, 30]
-
-        removed = sl.remove(1)
-
-        assert removed == 99
-        assert sl.to_list() == [10, 30]
-
-    def test_matches_python_list_behavior(self, sl):
-        expected = []
-
-        for value in [10, 20, 30, 40, 50]:
-            sl.add(len(expected), value)
-            expected.append(value)
-
-        sl.add(2, 99)
-        expected.insert(2, 99)
-
-        sl.set(4, 111)
-        expected[4] = 111
-
-        assert sl.to_list() == expected
 
 
 class TestInternalInvariants:

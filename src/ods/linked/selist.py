@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from ..arrays import BoundedDeque
+from ..base import BaseList
 from ..validation import Validator as Val
 
 
@@ -11,10 +12,7 @@ class Node:
         self.next: Optional[Node] = None
 
 
-# ------------------------------------------
-
-
-class SEList:
+class SEList(BaseList):
     """
 
     Theorem
@@ -42,10 +40,6 @@ class SEList:
         self.dummy = Node(self.b)
         self.dummy.prev = self.dummy
         self.dummy.next = self.dummy
-
-    @property
-    def size(self):
-        return self.n
 
     def get(self, i: int):
         Val.validate_index_access(i, self.size)
@@ -100,7 +94,10 @@ class SEList:
         self.n += 1
 
     def remove(self, i: int):
+        if self.n == 0:
+            raise IndexError("List is empty")
         Val.validate_index_access(i, self.size)
+
         u, j = self._get_location(i)
         y = u.d.get(j)
         w = u
@@ -127,6 +124,22 @@ class SEList:
 
         self.n -= 1
         return y
+
+    def __str__(self):
+        out = []
+        out.append(" Space Efficient Linked List ".center(50, "="))
+        out.append(f"n : {self.n}")
+
+        u = self.dummy.next
+        while u != self.dummy:
+            block = []
+            for raw_idx in range(u.d.n):
+                block.append(u.d.get(raw_idx))
+            empty_slots = [None] * (u.d.capacity - u.d.n)
+            out.append("node: " + str(block + empty_slots))
+            u = u.next
+
+        return "\n".join(out)
 
     # --------------------------------------
     # Internal Helpers
@@ -181,23 +194,3 @@ class SEList:
                 w.d.add_last(w.next.d.remove_first())
             w = w.next
         self._remove_node(w)
-
-    # ---------------------------------------------
-    # str... when testing
-    # ---------------------------------------------
-
-    def __str__(self):
-        out = []
-        out.append(" Space Efficient Linked List ".center(50, "="))
-        out.append(f"n : {self.n}")
-
-        u = self.dummy.next
-        while u != self.dummy:
-            block = []
-            for raw_idx in range(u.d.n):
-                block.append(u.d.get(raw_idx))
-            empty_slots = [None] * (u.d.capacity - u.d.n)
-            out.append("node: " + str(block + empty_slots))
-            u = u.next
-
-        return "\n".join(out)

@@ -1,7 +1,7 @@
 from typing import Any, Optional
 
 from ...validation import Validator as Val
-from .original_with_additions import ArrayDeque
+from .original import ArrayDeque
 
 
 class BoundedDeque(ArrayDeque):

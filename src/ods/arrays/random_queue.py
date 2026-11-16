@@ -2,8 +2,10 @@ import random
 from math import ceil
 from typing import Any
 
+from ..base import BaseCollection
 
-class RandomQeue:
+
+class RandomQeue(BaseCollection):
     def __init__(self):
         self.a = []
         self.n = 0

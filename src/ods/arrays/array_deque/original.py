@@ -1,41 +1,18 @@
 from typing import Any
 
+from ...base import BaseList
 from ...validation import Validator as Val
-from .base import ArrayDequeBase
 
 
-class ArrayDeque(ArrayDequeBase):
-    # ------------------------------------------------------
-    # Abstract interface requirements
-    # + convenience methods and properties
-    # ------------------------------------------------------
-
-    @property
-    def size(self):
-        return self.n
+class ArrayDeque(BaseList):
+    def __init__(self):
+        self.a = [None]
+        self.n = 0
+        self.j = 0
 
     @property
     def capacity(self):
         return len(self.a)
-
-    def is_empty(self):
-        return self.n == 0
-
-    def add_first(self, x: Any):
-        self.add(0, x)
-
-    def add_last(self, x: Any):
-        self.add(self.size, x)
-
-    def remove_first(self):
-        return self.remove(0)
-
-    def remove_last(self):
-        return self.remove(self.size - 1)
-
-    # ------------------------------------------------------
-    # additional methods - indexing, rotation, etc..
-    # -----------------------------------------------------
 
     def get(self, i: int):
         if self.is_empty():

@@ -1,28 +1,19 @@
 from typing import Any
 
+from ..base import BaseList
 from ..validation import Validator as Val
 
 
-class ArrayStack:
+class ArrayStack(BaseList):
+    """An ArrayStack with added index operations"""
+
     def __init__(self):
         self.a = [None] * 4
         self.n = 0
 
-    # ------------------------------------------------------
-    # Abstract interface requirements
-    # + convenience methods and properties
-    # ------------------------------------------------------
-
-    @property
-    def size(self):
-        return self.n
-
     @property
     def capacity(self):
         return len(self.a)
-
-    def is_empty(self):
-        return self.n == 0
 
     def get(self, i: int):
         if self.is_empty():
@@ -115,6 +106,13 @@ class ArrayStack:
 
         self.n += m
 
+    def __str__(self):
+        out = [f" {__class__.__name__} ".center(50, "=")]
+        out.append(f"{self.a}")
+        out.append(f"n: {self.n}")
+
+        return "\n".join(out)
+
     # ---------------------------------
     # internal helpers
     # ---------------------------------
@@ -134,10 +132,3 @@ class ArrayStack:
     def _maybe_shrink(self):
         if len(self.a) >= 4 and len(self.a) >= 3 * self.n:
             self._resize(len(self.a) // 2)
-
-    def __str__(self):
-        out = [f" {__class__.__name__} ".center(50, "=")]
-        out.append(f"{self.a}")
-        out.append(f"n: {self.n}")
-
-        return "\n".join(out)

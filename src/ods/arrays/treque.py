@@ -1,24 +1,18 @@
 from typing import Any
 
+from ..base import BaseList
 from ..validation import Validator as Val
 from .array_deque import ArrayDeque
 
 
-class Treque:
+class Treque(BaseList):
     def __init__(self):
         self.front = ArrayDeque()
         self.back = ArrayDeque()
 
-    # --------------------------------------------------------------
-    # Deque interface operations
-    # --------------------------------------------------------------
-
     @property
     def size(self):
         return self.front.n + self.back.n
-
-    def is_empty(self):
-        return self.size == 0
 
     def get(self, i: int) -> Any:
         Val.validate_index_access(i, self.size)
@@ -53,10 +47,6 @@ class Treque:
         if self.back.n > 0:
             return self.back.remove_last()
         return self.front.remove_last()
-
-    # --------------------------------------------------------------
-    # other public methods - with indexing etc...
-    # --------------------------------------------------------------
 
     def add(self, i: int, x: Any) -> None:
         Val.validate_index_insert(i, self.size)

@@ -1,6 +1,7 @@
 from typing import Any, Optional
 
 from ..arrays import BoundedDeque
+from ..base import BaseCollection
 
 
 class Node:
@@ -10,10 +11,7 @@ class Node:
         self.next: Optional[Node] = None
 
 
-# ------------------------------------------
-
-
-class SELDeque:
+class SELDeque(BaseCollection):
     """
     Version of an SEList that supports all the Deque operations
     in constant amortized time per operation, independent of
@@ -52,11 +50,10 @@ class SELDeque:
         self.n += 1
 
     def remove_first(self) -> Any:
+        if self.n == 0:
+            raise IndexError("List is empty")
+
         first = self.dummy.next
-
-        if first is self.dummy:
-            raise Exception("SEL is empty")
-
         x = first.d.remove_first()
         if first.d.size == 0:
             self._remove_node(first)
@@ -65,17 +62,32 @@ class SELDeque:
         return x
 
     def remove_last(self) -> Any:
+        if self.n == 0:
+            raise IndexError("List is empty")
+
         last = self.dummy.prev
-
-        if last is self.dummy:
-            raise Exception("SEL is empty")
-
         x = last.d.remove_last()
         if last.d.size == 0:
             self._remove_node(last)
 
         self.n -= 1
         return x
+
+    def __str__(self):
+        out = []
+        out.append("\n" + " Space Efficient Linked Deque ".center(50, "="))
+        out.append(f"n : {self.n}")
+
+        u = self.dummy.next
+        while u != self.dummy:
+            block = []
+            for raw_idx in range(u.d.n):
+                block.append(u.d.get(raw_idx))
+            empty_slots = [None] * (u.d.capacity - u.d.n)
+            out.append("node: " + str(block + empty_slots))
+            u = u.next
+
+        return "\n".join(out)
 
     # --------------------------------------
     # Internal Helpers
@@ -95,23 +107,3 @@ class SELDeque:
         u.next.prev = u
         u.prev.next = u
         return u
-
-    # ---------------------------------------------
-    # str... when testing
-    # ---------------------------------------------
-
-    def __str__(self):
-        out = []
-        out.append("\n" + " Space Efficient Linked Deque ".center(50, "="))
-        out.append(f"n : {self.n}")
-
-        u = self.dummy.next
-        while u != self.dummy:
-            block = []
-            for raw_idx in range(u.d.n):
-                block.append(u.d.get(raw_idx))
-            empty_slots = [None] * (u.d.capacity - u.d.n)
-            out.append("node: " + str(block + empty_slots))
-            u = u.next
-
-        return "\n".join(out)

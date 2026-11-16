@@ -1,46 +1,18 @@
 from typing import Any
 
 from ...validation import Validator as Val
-from .base import ArrayDequeBase
+from .original import ArrayDeque
 
 
-class NoModDeque(ArrayDequeBase):
+class NoModDeque(ArrayDeque):
     def __init__(self, min_size: int = 4):
         self.min_size = min_size
         self.a = [None] * self.min_size
         self.n = 0
         self.j = 0
 
-    # ------------------------------------------------------
-    # Abstract interface requirements
-    # + convenience methods and properties
-    # ------------------------------------------------------
-
-    @property
-    def size(self):
-        return self.n
-
-    @property
-    def capacity(self):
-        return len(self.a)
-
-    def is_empty(self):
-        return self.n == 0
-
-    def add_first(self, x: Any):
-        self.add(0, x)
-
-    def add_last(self, x: Any):
-        self.add(self.size, x)
-
-    def remove_first(self):
-        return self.remove(0)
-
-    def remove_last(self):
-        return self.remove(self.size - 1)
-
     # -------------------------------------------------------
-    # Public additions - operations with indexing, rotating...
+    # Overriding ArrayDeque with AND operations
     # -------------------------------------------------------
 
     def get(self, i: int):
@@ -160,17 +132,6 @@ class NoModDeque(ArrayDequeBase):
     # Internal Helpers
     # --------------------------------------------------------
 
-    def _resize_grow(self):
-        new_capacity = self.capacity * 2
-        self._set_new_array(new_capacity)
-
-    def _resize_shrink(self):
-        if self.capacity == self.min_size:
-            return
-        else:
-            new_capacity = self.capacity // 2
-        self._set_new_array(new_capacity)
-
     def _set_new_array(self, new_capacity: int):
         b = [None] * new_capacity
 
@@ -229,12 +190,6 @@ class NoModDeque(ArrayDequeBase):
 
             # write last to first
             self.a[self.j] = last
-
-    def __lshift__(self, r: int):
-        self._rotate_left(r)
-
-    def __rshift__(self, r: int):
-        self._rotate_right(r)
 
     def __str__(self):
         header = f" {__class__.__name__} ".center(50, "=")

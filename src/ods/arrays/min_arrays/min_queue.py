@@ -1,9 +1,10 @@
 from typing import Any
 
+from ...base import BaseCollection
 from ..array_queue import ArrayQueue
 
 
-class MinQueue:
+class MinQueue(BaseCollection):
     def __init__(self):
         self.main_queue = ArrayQueue()
         self.aux_queue = ArrayQueue()

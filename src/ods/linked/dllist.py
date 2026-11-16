@@ -1,5 +1,6 @@
 from typing import Any, Iterable, Optional
 
+from ..base import BaseList
 from ..validation import Validator as Val
 
 
@@ -10,7 +11,7 @@ class Node:
         self.next: Optional[Node] = None
 
 
-class DLList:
+class DLList(BaseList):
     """
     Attributes
     ----------
@@ -38,13 +39,6 @@ class DLList:
         self.dummy.next = self.dummy
         self.add_all(0, array)
 
-    @property
-    def size(self):
-        return self.n
-
-    def is_empty(self):
-        return self.n == 0
-
     def get(self, i) -> Any:
         Val.validate_index_access(i, self.size)
         return self._get_node(i).x
@@ -61,6 +55,9 @@ class DLList:
         self._add_before(self._get_node(i), x)
 
     def remove(self, i: int) -> Any:
+        if self.n == 0:
+            raise IndexError("List is empty")
+
         Val.validate_index_access(i, self.size)
         removed_node = self._remove_node(self._get_node(i))
         return removed_node.x
@@ -155,9 +152,6 @@ class DLList:
 
         self._remove_node(self.dummy)
         self.dummy = self._add_before(head, None)
-
-    def to_list(self):
-        return list(iter(self))
 
     def truncate(self, i: int) -> "DLList":
         Val.validate_index_access(i, self.size)

@@ -1,41 +1,18 @@
 from typing import Any
 
+from ...base import BaseList
 from ...validation import Validator as Val
 from ..array_stack import ArrayStack
 
 
-class DualArrayDeque:
+class DualArrayDeque(BaseList):
     def __init__(self):
         self.front = ArrayStack()
         self.back = ArrayStack()
 
-    # ------------------------------------------------------
-    # Abstract interface requirements
-    # + convenience methods and properties
-    # ------------------------------------------------------
-
     @property
     def size(self):
         return self.front.n + self.back.n
-
-    def is_empty(self):
-        return self.size == 0
-
-    def add_first(self, x: Any):
-        self.add(0, x)
-
-    def add_last(self, x: Any):
-        self.add(self.size, x)
-
-    def remove_first(self) -> Any:
-        return self.remove(0)
-
-    def remove_last(self) -> Any:
-        return self.remove(self.size - 1)
-
-    # ---------------------------------
-    # Additional public methods
-    # ---------------------------------
 
     def get(self, i: int):
         if self.is_empty():

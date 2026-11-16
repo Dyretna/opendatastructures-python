@@ -1,22 +1,17 @@
 from math import ceil, sqrt
 from typing import Any
 
+from ...base import BaseList
+from ...validation import Validator as Val
 from ..array_stack import ArrayStack
 
 
-class RootishArrayStack:
+class RootishArrayStack(BaseList):
     def __init__(self):
         # number of elements stored
         self.n = 0
         # stack of blocks; each block is a Python list
         self.blocks = ArrayStack()
-
-    @property
-    def size(self):
-        return self.n
-
-    def is_empty(self):
-        return self.n == 0
 
     def i2b(self, i: int):
         # compute block index b that contains element at list index i (0-based)
@@ -26,7 +21,7 @@ class RootishArrayStack:
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         b = self.i2b(i)
         # j is the index inside block b
@@ -36,7 +31,7 @@ class RootishArrayStack:
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         b = self.i2b(i)
         j = i - b * (b + 1) // 2
@@ -46,7 +41,7 @@ class RootishArrayStack:
         return y
 
     def add(self, i: int, x: Any):
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         # ensure there is room for one more element:
         # while total capacity < n+1, grow
@@ -63,7 +58,7 @@ class RootishArrayStack:
     def remove(self, i: int):
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         x = self.get(i)
 
@@ -76,31 +71,6 @@ class RootishArrayStack:
         self._shrink()
 
         return x
-
-    # ---------------------------------------------------
-    # internal helpers
-    # ---------------------------------------------------
-
-    def _index_bounds_check(self, i: int):
-        if not (0 <= i <= self.size - 1):
-            raise IndexError("index not in range")
-
-    def _index_bounds_check_adding(self, i: int):
-        if not (0 <= i <= self.size):
-            raise IndexError("index not in range")
-
-    def _grow(self):
-        # add a new block of size n + 1 (filled with None)
-        new_block = [None] * (self.blocks.n + 1)
-        # append at the end of blocks
-        self.blocks.add(self.blocks.n, new_block)
-
-    def _shrink(self):
-        r = self.blocks.n
-        while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:
-            self.blocks.a[r - 1] = None
-            self.blocks.remove(r - 1)
-            r -= 1
 
     def __str__(self):
         """Displays blocks with zombie values masked as None.
@@ -127,3 +97,20 @@ class RootishArrayStack:
             out.append(f"block {i:^3}: {display}")
 
         return "\n".join(out)
+
+    # ---------------------------------------------------
+    # internal helpers
+    # ---------------------------------------------------
+
+    def _grow(self):
+        # add a new block of size n + 1 (filled with None)
+        new_block = [None] * (self.blocks.n + 1)
+        # append at the end of blocks
+        self.blocks.add(self.blocks.n, new_block)
+
+    def _shrink(self):
+        r = self.blocks.n
+        while r > 0 and ((r - 1) * (r - 2)) // 2 >= self.n:
+            self.blocks.a[r - 1] = None
+            self.blocks.remove(r - 1)
+            r -= 1

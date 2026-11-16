@@ -53,10 +53,12 @@ The new problem will be the index to block translation in the method:
 from math import ceil, sqrt
 from typing import Any
 
+from ...base import BaseList
+from ...validation import Validator as Val
 from ..array_stack import ArrayStack
 
 
-class ImprovedRAS:
+class ImprovedRAS(BaseList):
     """
     An implementation of a RootishArrayStack that:
     has only O(√n) wasted space, but that can perform
@@ -76,20 +78,13 @@ class ImprovedRAS:
         self.back = ArrayStack()
 
     @property
-    def size(self):
-        return self.n
-
-    @property
     def total_blocks(self):
         return self.front.size + self.back.size
-
-    def is_empty(self):
-        return self.n == 0
 
     def get(self, i):
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         # 1. Determine correct ArrayStack half, and
         # 2. transform global index 'i' to local index 'p'
@@ -108,7 +103,7 @@ class ImprovedRAS:
     def set(self, i: int, x: Any):
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         stack_half, p = self._get_as_half_and_p(i)
         b = self._i2b(p)
@@ -121,7 +116,7 @@ class ImprovedRAS:
         return old
 
     def add(self, i: int, x: Any):
-        self._index_bounds_check_adding(i)
+        Val.validate_index_insert(i, self.size)
 
         # As in original RAS, element counters must
         # increment before shifting.
@@ -146,7 +141,7 @@ class ImprovedRAS:
     def remove(self, i: int) -> Any:
         if self.is_empty():
             raise IndexError("Stack is empty.")
-        self._index_bounds_check(i)
+        Val.validate_index_access(i, self.size)
 
         x = self.get(i)
         if i < self.front_n:
@@ -173,14 +168,6 @@ class ImprovedRAS:
     # ---------------------------------------------------
     # internal helpers
     # ---------------------------------------------------
-
-    def _index_bounds_check(self, i: int) -> None:
-        if not (0 <= i <= self.size - 1):
-            raise IndexError(f"index not in range: {i}")
-
-    def _index_bounds_check_adding(self, i: int) -> None:
-        if not (0 <= i <= self.size):
-            raise IndexError(f"index not in range: {i}")
 
     def _i2b(self, i: int) -> int:
         return int(ceil((-3.0 + sqrt(9 + 8 * i)) / 2.0))
