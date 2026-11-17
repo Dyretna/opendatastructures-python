@@ -1,58 +1,101 @@
 from typing import Any
 
 from ...base import BaseCollection
-from ..array_deque import OrderedDeque
+from .min_stack import MinStack
 
 
 class MinDeque(BaseCollection):
     def __init__(self):
-        self.main_deque = OrderedDeque()
-        self.aux_deque = OrderedDeque()
+        self.front = MinStack()
+        self.back = MinStack()
 
     @property
     def size(self):
-        return self.aux_deque.n
+        return self.front.size + self.back.size
+
+    def get(self, i: int) -> Any:
+        fs = self.front.size
+        if i < fs:
+            return self.front.get(fs - 1 - i)
+        return self.back.get(i - fs)
 
     def add_first(self, x: Any):
-        self.main_deque.add_first(x)
-
-        if self.size == 0:
-            self.aux_deque.add_first(x)
-        elif x > self.aux_deque.a[self.aux_deque.block_start]:
-            self.aux_deque.add_first(self.aux_deque.a[self.aux_deque.block_start])
-        else:
-            self.aux_deque.add_first(x)
+        self.front.push(x)
+        self._balance()
 
     def add_last(self, x: Any):
-        self.main_deque.add_last(x)
+        self.back.push(x)
+        self._balance()
 
-        if self.size == 0:
-            self.aux_deque.add_last(x)
-        elif x > self.aux_deque.a[self.aux_deque.block_end]:
-            self.aux_deque.add_last(self.aux_deque.a[self.aux_deque.block_end])
-        else:
-            self.aux_deque.add_last(x)
+    def remove_first(self) -> Any:
+        if self.front.is_empty():
+            if self.back.size == 1:
+                return self.back.pop()
+            self._balance()
 
-    def pop_left(self) -> Any:
-        self.main_deque.remove_first()
-        self.aux_deque.remove_first()
+        x = self.front.pop()
+        self._balance()
 
-    def pop_right(self) -> Any:
-        self.main_deque.remove_last()
-        self.aux_deque.remove_first()
+        return x
 
-    def get_min(self):
-        first = self.aux_deque.a[self.aux_deque.block_start]
-        last = self.aux_deque.a[self.aux_deque.block_end]
-        if first <= last:
-            return first
-        else:
-            return last
+    def remove_last(self) -> Any:
+        if self.back.is_empty():
+            if self.front.size == 1:
+                return self.front.pop()
+            self._balance()
+
+        x = self.back.pop()
+        self._balance()
+
+        return x
+
+    def get_min(self) -> int:
+        if self.front.is_empty() and self.back.is_empty():
+            raise IndexError("get_min from empty MinDeque")
+
+        if self.front.is_empty():
+            return self.back.get_min()
+
+        if self.back.is_empty():
+            return self.front.get_min()
+
+        front_min = self.front.get_min()
+        back_min = self.back.get_min()
+
+        return front_min if front_min < back_min else back_min
+
+    def __iter__(self):
+        for x in reversed(list(self.front)):
+            yield x
+        for x in self.back:
+            yield x
+
+    def __repr__(self):
+        if self.is_empty():
+            return f"{self.__class__.__name__}([], min: None)"
+        return f"{self.__class__.__name__}({list(self)}, min: {self.get_min()})"
 
     def __str__(self):
-        out = [" MinDeque ".center(40, "=")]
-        out.append(f"MainDeque: {self.main_deque.a}")
-        out.append(f"AuxDeque: {self.aux_deque.a}")
-        out.append(f"Size: {self.size}")
-        out.append(f"Min: {self.get_min()}")
+        out = [" MinDeque ".center(50, "=")]
+        out.append(f"Front : {repr(self.front)}")
+        out.append(f"Back  : {repr(self.back)}")
+        out.append(f"Size  : {self.size}")
+        out.append(f"Min   : {self.get_min()}")
         return "\n".join(out)
+
+    def _balance(self):
+        fs = self.front.size
+        bs = self.back.size
+        if fs == 0 or bs == 0 or 3 * fs < bs or 3 * bs < fs:
+            mid = (self.size + 1) // 2
+
+            f = MinStack()
+            for i in reversed(range(mid)):
+                f.push(self.get(i))
+
+            b = MinStack()
+            for i in range(mid, self.size):
+                b.push(self.get(i))
+
+            self.front = f
+            self.back = b

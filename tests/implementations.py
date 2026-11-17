@@ -17,9 +17,13 @@ Source of what implementations are tested against what contract.
 
 from ods.arrays import (
     ArrayDeque,
+    ArrayQueue,
     ArrayStack,
     DualArrayDeque,
     ImprovedRAS,
+    MinDeque,
+    MinQueue,
+    MinStack,
     NoModDeque,
     OrderedDeque,
     RootishArrayStack,
@@ -35,6 +39,7 @@ DEQUE_IMPLS = [
     ArrayStack,
     ArrayDeque,
     DualArrayDeque,
+    MinDeque,
     NoModDeque,
     OrderedDeque,
     RootishArrayStack,
@@ -64,6 +69,20 @@ INDEX_IMPLS = [
     SkiplistList,
 ]
 
+# add/remove
+QUEUE_IMPLS = [
+    ArrayQueue,
+    MinQueue,
+]
+
+# push/pop
+STACK_IMPLS = [
+    ArrayStack,
+    MinStack,
+]
+
 # minimal base contract: size/is_empty + facades.
 # test_invariants.py
-ALL_IMPLS = sorted({*DEQUE_IMPLS, *INDEX_IMPLS}, key=lambda c: c.__name__)
+ALL_IMPLS = sorted(
+    {*DEQUE_IMPLS, *INDEX_IMPLS, *QUEUE_IMPLS, *STACK_IMPLS}, key=lambda c: c.__name__
+)

@@ -26,10 +26,44 @@ def build(seq, values):
 
 
 def drain_first(seq):
-    """Remove every element from the front, in order."""
+    """Remove every element via remove_first(); in order."""
     return [seq.remove_first() for _ in range(seq.size)]
 
 
 def drain_last(seq):
-    """Remove every element from the back, in order (front to back)."""
+    """Remove every element via remove_last(); returns back-to-front order."""
     return [seq.remove_last() for _ in range(seq.size)]
+
+
+def drain_stack(seq):
+    """Pop everything via pop(); returns back-to-front order (LIFO drain)."""
+    return [seq.pop() for _ in range(seq.size)]
+
+
+def drain_queue(seq):
+    """Dequeue everything via remove(); returns front-to-back order (FIFO drain)."""
+    return [seq.remove() for _ in range(seq.size)]
+
+
+def add_item(seq, x):
+    """Insert one element through whichever insert interface seq exposes.
+
+    Invariants never care about position/order, so any insert endpoint
+    works. Prefer the list facades, then stack push, then queue add.
+    """
+    if hasattr(seq, "add_last"):
+        seq.add_last(x)
+    elif hasattr(seq, "push"):
+        seq.push(x)
+    else:
+        seq.add(x)
+
+
+def remove_item(seq):
+    """Remove one element through whichever remove interface seq exposes."""
+    if hasattr(seq, "remove_last"):
+        seq.remove_last()
+    elif hasattr(seq, "pop"):
+        seq.pop()
+    else:
+        seq.remove()

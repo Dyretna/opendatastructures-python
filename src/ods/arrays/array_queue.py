@@ -55,6 +55,10 @@ class ArrayQueue(BaseCollection):
             self._resize()
         return x
 
+    def __iter__(self):
+        for i in range(self.size):
+            yield self.get(i)
+
     def __str__(self):
         out = [f" {__class__.__name__} ".center(50, "=")]
         out.append(f"{self.a}")
