@@ -5,8 +5,8 @@ from .original import ArrayDeque
 
 
 class BoundedDeque(ArrayDeque):
-    def __init__(self, capacity: Optional[int] = 4):
-        self.a = [None] * capacity
+    def __init__(self, b: Optional[int] = 3):
+        self.a = [None] * (b + 1)
         self.j = 0
         self.n = 0
 
@@ -38,3 +38,10 @@ class BoundedDeque(ArrayDeque):
         out.append(f"size: {self.size}")
         out.append(f"capacity: {self.capacity}")
         return "\n".join(out)
+
+    # change of array-size forbidden.
+    def _resize_grow(self):
+        pass
+
+    def _resize_shrink(self):
+        pass

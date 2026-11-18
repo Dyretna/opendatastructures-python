@@ -6,8 +6,8 @@ from ..validation import Validator as Val
 
 
 class Node:
-    def __init__(self, block_size: int):
-        self.d = BoundedDeque(block_size + 1)
+    def __init__(self, b: int):
+        self.d = BoundedDeque(b)  # BDeque holds up to b+1 elements
         self.prev: Optional[Node] = None
         self.next: Optional[Node] = None
 
@@ -33,13 +33,10 @@ class SEList(BaseList):
 
     """
 
-    def __init__(self, block_size: int = 7):
-        self.n = 0
-        self.b = block_size  # BDeque has + 1 empty space
-
-        self.dummy = Node(self.b)
-        self.dummy.prev = self.dummy
-        self.dummy.next = self.dummy
+    def __init__(self, block_size: int = 3):
+        super(SEList, self).__init__()
+        self.b = block_size  # blocks hold b+1 elements
+        self._initialize()
 
     def get(self, i: int):
         Val.validate_index_access(i, self.size)
@@ -51,13 +48,6 @@ class SEList(BaseList):
         u, j = self._get_location(i)
         return u.d.set(j, x)
 
-    def append(self, x: Any):
-        last = self.dummy.prev
-        if last == self.dummy or last.d.size == self.b + 1:
-            last = self._add_before(self.dummy)
-        last.d.add_last(x)
-        self.n += 1
-
     def add(self, i: int, x: Any):
         Val.validate_index_insert(i, self.size)
         # if we add to end - simply append
@@ -68,17 +58,17 @@ class SEList(BaseList):
         u, j = self._get_location(i)
         r = 0  # number of steps
         w = u
-
-        # we increment steps until its still lower than block-size
-        # Node 'w' cannot be dummy (go over one lap)
-        # We make sure the BDeques in Nodes are full (spare space covered)
-        while r < self.b and w != self.dummy and w.d.size == self.b + 1:
+        # --------------------------------------------------------------
+        # count how many consecutive nodes starting at u are full (b+1)
+        # stop early if we hit the dummy (list ended) or an under-full node
+        # --------------------------------------------------------------
+        while r < self.b and w is not self.dummy and w.d.size == self.b + 1:
             w = w.next
             r += 1
-
-        # if more steps than size of blocks
-        # we have to add a new node, and spread
-        # elements to make space
+        # --------------------------------------------------------------
+        # if more steps than size of blocks we have to add a new node,
+        # and spread elements to make space
+        # --------------------------------------------------------------
         if r == self.b:  # b blocks, each with b+1 elements
             self._spread(u)
             w = u
@@ -86,11 +76,18 @@ class SEList(BaseList):
         if w == self.dummy:  # ran off the end - add new node
             w = self._add_before(w)
 
-        while w != u:  # work backwards, shifting as we go
+        while w is not u:  # work backwards, shifting as we go
             w.d.add_first(w.prev.d.remove_last())
             w = w.prev
 
         w.d.add(j, x)
+        self.n += 1
+
+    def append(self, x: Any):
+        last = self.dummy.prev
+        if last == self.dummy or last.d.size == self.b + 1:
+            last = self._add_before(self.dummy)
+        last.d.append(x)
         self.n += 1
 
     def remove(self, i: int):
@@ -103,27 +100,39 @@ class SEList(BaseList):
         w = u
         r = 0
 
-        while r < self.b and w != self.dummy and w.d.size == self.b - 1:
+        while r < self.b and w is not self.dummy and w.d.size == self.b - 1:
             w = w.next
             r += 1
-
-        # r number of steps equals block size
-        # we gather elements, and delete empty node
+        # ---------------------------------------------------------
+        # 1. if b following nodes ar too empty (b-1)
+        # 2. compress via gather
+        # 3. remove the element j in node u,
+        # 4. fill gaps shift from right until u has at least b-1,
+        # 5. delete node if empty.
+        # ---------------------------------------------------------
         if r == self.b:  # b blocks, each with b - 1 elements
-            print("remove, calling gather")
             self._gather(u)
         u.d.remove(j)
 
-        while u.d.size < self.b - 1 and u.next != self.dummy:
+        while u.d.size < (self.b - 1) and u.next is not self.dummy:
             u.d.add_last(u.next.d.remove_first())
             u = u.next
 
         if u.d.size == 0:
-            print("remove, size is 0")
             self._remove_node(u)
 
         self.n -= 1
         return y
+
+    def clear(self):
+        self._initialize()
+
+    def __iter__(self):
+        u = self.dummy.next
+        while u is not self.dummy:
+            for x in u.d:
+                yield x
+            u = u.next
 
     def __str__(self):
         out = []
@@ -145,14 +154,31 @@ class SEList(BaseList):
     # Internal Helpers
     # --------------------------------------
 
+    def _initialize(self):
+        self.dummy = self._new_node()
+        self.dummy.next = self.dummy.prev = self.dummy
+        self.n = 0
+
     def _get_location(self, i: int) -> tuple[Node, int]:
-        if i < self.n // 2:
+        """Returns correct Node and block index."""
+        # Walk from whichever end of the list is closer
+        # to i, stepping over whole blocks. Each block's
+        # size is subtracted from the target index until
+        # it falls inside the current block.
+
+        if i < self.size // 2:
+            # Closer to the front: walk forward from the
+            # first block. Invariant: i is now an offset
+            # relative to the start of u.
             u = self.dummy.next
             while i >= u.d.size:
-                i = i - u.d.size
+                i -= u.d.size
                 u = u.next
             return u, i
-
+        # Closer to the back: walk backward from the
+        # dummy. Invariant: idx is the number of elements
+        # before u (i.e. i counts elements from the end of
+        # u's block onwards).
         else:
             u = self.dummy
             idx = self.n
@@ -178,18 +204,18 @@ class SEList(BaseList):
 
     def _spread(self, u: Node) -> None:
         w = u
-        for _ in range(self.b - 1):
+        for _ in range(self.b):
             w = w.next
 
         w = self._add_before(w)
-        while w != u:
+        while w is not u:
             while w.d.size < self.b:
                 w.d.add_first(w.prev.d.remove_last())
             w = w.prev
 
     def _gather(self, u: Node) -> None:
         w = u
-        for _ in range(self.b - 2):
+        for _ in range(self.b - 1):
             while w.d.size < self.b:
                 w.d.add_last(w.next.d.remove_first())
             w = w.next

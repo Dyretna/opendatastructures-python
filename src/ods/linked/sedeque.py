@@ -11,7 +11,7 @@ class Node:
         self.next: Optional[Node] = None
 
 
-class SELDeque(BaseCollection):
+class SEDeque(BaseCollection):
     """
     Version of an SEList that supports all the Deque operations
     in constant amortized time per operation, independent of
@@ -33,7 +33,7 @@ class SELDeque(BaseCollection):
 
     def get_last(self):
         u = self.dummy.prev
-        return u.d.get(0)
+        return u.d.get(self.size - 1)
 
     def add_first(self, x: Any):
         first = self.dummy.next
@@ -83,7 +83,7 @@ class SELDeque(BaseCollection):
             block = []
             for raw_idx in range(u.d.n):
                 block.append(u.d.get(raw_idx))
-            empty_slots = [None] * (u.d.capacity - u.d.n)
+            empty_slots = [None] * (u.d.capacity - u.d.size)
             out.append("node: " + str(block + empty_slots))
             u = u.next
 
