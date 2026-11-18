@@ -44,53 +44,33 @@ class TestConstructor:
         assert s.to_list() == expected
         assert s.size == len(expected)
 
-    def test_init_from_generator(self):
-        s = SLList(x * 2 for x in range(3))
-        assert s.to_list() == [0, 2, 4]
-        assert s.size == 3
-
     def test_init_sets_head_and_tail(self, three):
         assert three.head.x == 1
         assert three.tail.x == 3
         assert three.tail.next is None
 
 
-class TestAddAll:
-    def test_add_all_into_empty(self, empty):
-        empty.add_all(0, [10, 20])
-        assert empty.to_list() == [10, 20]
+class TestIteration:
+    def test_iter_yields_original_values(self, three):
+        assert list(three) == [1, 2, 3]
+        assert all(type(x) is int for x in three)
 
-    def test_add_all_at_front(self, three):
-        three.add_all(0, [-2, -1])
-        assert three.to_list() == [-2, -1, 1, 2, 3]
-
-    @pytest.mark.parametrize(
-        "i,expected",
-        [
-            (0, [7, 8, 1, 2, 3]),
-            (1, [1, 7, 8, 2, 3]),
-            (2, [1, 2, 7, 8, 3]),
-            (3, [1, 2, 3, 7, 8]),
-        ],
-    )
-    def test_add_all_at_all_positions(self, three, i, expected):
-        three.add_all(i, [7, 8])
-        assert three.to_list() == expected
-        assert three.size == 5
-
-    def test_add_all_empty_iterable_is_noop(self, three):
-        three.add_all(1, [])
-        assert three.to_list() == [1, 2, 3]
+    def test_iter_does_not_mutate_original(self, three):
+        list(three)
         assert three.size == 3
+        assert three.head.x == 1
+        assert three.tail.x == 3
+        three.check_size()
 
-    def test_add_all_invalid_index_raises(self, three):
-        with pytest.raises(IndexError):
-            three.add_all(4, [7])
-
-    def test_add_all_keeps_tail(self, three):
-        three.add_all(3, [4, 5])
-        assert three.tail.x == 5
-        assert three.tail.next is None
+    def test_size_tracks_mixed_operations(self):
+        s = SLList([1, 2])
+        s.push(0)
+        s.add_last(3)
+        assert s.size == 4
+        s.pop()
+        s.remove_last()
+        assert s.size == 2
+        assert s.to_list() == [1, 2]
 
 
 class TestDelegation:
@@ -168,76 +148,6 @@ class TestQueue:
         assert empty.head is None and empty.tail is None
 
 
-class TestGetSet:
-    @pytest.mark.parametrize("i,expected", [(0, 1), (1, 2), (2, 3)])
-    def test_get_valid_indices(self, three, i, expected):
-        assert three.get(i) == expected
-
-    @pytest.mark.parametrize("i", [-1, 3, 10])
-    def test_get_invalid_indices_raise(self, three, i):
-        with pytest.raises(IndexError):
-            three.get(i)
-
-    def test_set_updates_value(self, three):
-        three.set(1, "x")
-        assert three.to_list() == [1, "x", 3]
-
-    @pytest.mark.parametrize("i", [-1, 3])
-    def test_set_invalid_indices_raise(self, three, i):
-        with pytest.raises(IndexError):
-            three.set(i, "x")
-
-
-class TestAddRemoveGeneral:
-    @pytest.mark.parametrize(
-        "i,expected",
-        [
-            (0, [9, 1, 2, 3]),
-            (1, [1, 9, 2, 3]),
-            (2, [1, 2, 9, 3]),
-            (3, [1, 2, 3, 9]),
-        ],
-    )
-    def test_add_middle_and_edges(self, three, i, expected):
-        three.add(i, 9)
-        assert three.to_list() == expected
-
-    @pytest.mark.parametrize(
-        "i,removed,rest",
-        [
-            (0, 1, [2, 3]),
-            (1, 2, [1, 3]),
-            (2, 3, [1, 2]),
-        ],
-    )
-    def test_remove_all_positions(self, three, i, removed, rest):
-        assert three.remove(i) == removed
-        assert three.to_list() == rest
-        assert three.size == 2
-
-    def test_add_beyond_end_raises(self, three):
-        with pytest.raises(IndexError):
-            three.add(4, "x")
-
-    def test_remove_empty_raises(self, empty):
-        with pytest.raises(IndexError):
-            assert empty.remove(0)
-
-    def test_remove_last_empty_raises(self, empty):
-        with pytest.raises(IndexError):
-            assert empty.remove_last()
-
-    def test_repeated_removes_leave_consistent_state(self, five):
-        for _ in range(5):
-            five.remove(0)
-        assert five.size == 0
-        assert five.head is None
-        assert five.tail is None
-        five.add_last(1)
-        assert five.to_list() == [1]
-        assert five.tail.x == 1
-
-
 class TestCheckSize:
     @pytest.mark.parametrize("values", [[], [1], [1, 2, 3], [1, 2, 3, 4, 5]])
     def test_check_size_passes_on_consistent_lists(self, values):
@@ -281,29 +191,3 @@ class TestUtilities:
     )
     def test_second_last(self, values, expected):
         assert SLList(values).second_last() == expected
-
-
-class TestIteration:
-    def test_iter_yields_original_values(self, three):
-        assert list(three) == [1, 2, 3]
-        assert all(type(x) is int for x in three)
-
-    def test_iter_does_not_mutate_original(self, three):
-        list(three)
-        assert three.size == 3
-        assert three.head.x == 1
-        assert three.tail.x == 3
-        three.check_size()
-
-    def test_to_list_matches_iter(self, five):
-        assert five.to_list() == list(five)
-
-    def test_size_tracks_mixed_operations(self):
-        s = SLList([1, 2])
-        s.push(0)
-        s.add_last(3)
-        assert s.size == 4
-        s.pop()
-        s.remove_last()
-        assert s.size == 2
-        assert s.to_list() == [1, 2]

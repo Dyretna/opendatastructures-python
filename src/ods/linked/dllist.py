@@ -196,10 +196,6 @@ class DLList(BaseList):
 
         return "\n".join([header, n, nodes_str])
 
-    # -------------------------------------------------
-    # Merge-sort methods, under construction...
-    # -------------------------------------------------
-
     def absorb(self, l2: "DLList"):
         """Absorbs a DLList in constant time (no iteration)."""
         if l2.is_empty():
@@ -227,9 +223,18 @@ class DLList(BaseList):
         l2.dummy.prev = l2.dummy
         l2.dummy.next = l2.dummy
 
+    # -------------------------------------------------
+    # Merge-sort
+    # -------------------------------------------------
+
     def take_first(self, l2: "DLList"):
+        """
+        Takes the first node from l2 and appends it to the the
+        receiving list. This is equivalent to add(size(),
+        l2.remove(0)), except that it should not create a new node.
+
+        """
         if l2.is_empty():
-            # or return None?
             raise IndexError("DLL l2 cannot be empty")
 
         self._append(l2._remove_node(l2.dummy.next))
@@ -237,35 +242,62 @@ class DLList(BaseList):
     @staticmethod
     def merge(l1: "DLList", l2: "DLList") -> "DLList":
         """
-        Takes two sorted lists l1 and l2, merges them, and returns a new
-        sorted list containing the result. This causes l1 and l2 to be emptied
-        in the process. For example, if l1 contains a, c, d and l2 contains
-        b, e, f, then this methods returns a new list containing a, b, c, d,
-        e, f.
+        Takes two sorted lists l1 and l2, merges them, and returns
+        a new sorted list containing the result. This causes l1 and
+        l2 to be emptied in the process. For example, if l1 contains
+        a, c, d and l2 contains b, e, f, then this methods returns
+        a new list containing a, b, c, d, e, f.
 
-        merge(a0, a1, a)
-            i0 ← i1 ← 0
-            for i in 0, 1, 2, . . . , length(a) - 1 do
-                if i0 = length(a0) then
-                    a[i] ← a1[i1]
-                    i1 ← i2
-                else if i1 = length(a1)
-                    a[i] ← a0[i0]
-                    i0 ← i1
-                else if a0[i0] ≤ a1[i1]
-                    a[i] ← a0[i0]
-                    i0 ← i1
-                else
-                    a[i] ← a1[i1]
-                    i1 ← i2
         """
-        pass
+        result = DLList()
+
+        # as long as both lists has content
+        while l1.dummy.next is not l1.dummy and l2.dummy.next is not l2.dummy:
+            if l1.dummy.next.x < l2.dummy.next.x:
+                result.take_first(l1)
+            else:
+                result.take_first(l2)
+
+        # After having 'iterating' at same lengths,
+        # take the rest of what is left from the
+        # longest list.
+        while l1.dummy.next is not l1.dummy:
+            result.take_first(l1)
+
+        while l2.dummy.next is not l2.dummy:
+            result.take_first(l2)
+
+        return result
 
     def sort(self):
-        if self.n <= 1:
+        """
+        Sorts the elements contained in the list using the merge
+        sort algorithm:
+            - divide
+            - sort left
+            - sort right
+            - merge
+
+        """
+        # end point of recursion
+        if self.size <= 1:
             return self
 
-        pass
+        # Save original size before truncate
+        og_size = self.size
+        mid = og_size // 2
+        l2 = self.truncate(mid)
+
+        # recursively sort both halves down to size 1
+        # merging happends later as recursion unwinds
+        # (building tree from leaves, bottom-up)
+        self.sort()
+        l2.sort()
+        merged = self.merge(self, l2)
+
+        # set dummy and reset to original size
+        self.dummy = merged.dummy
+        self.n = og_size
 
     # --------------------------------------
     # Internal Helpers

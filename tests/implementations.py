@@ -65,6 +65,7 @@ INDEX_IMPLS = [
     Treque,
     # linked
     SLList,
+    DLList,
     # skiplist
     SkiplistList,
 ]
