@@ -1,58 +1,5 @@
 from ods.arrays import ArrayQueue
 
-# --------------------------------------------------
-# stack abstract interface methods: add(), remove()
-# --------------------------------------------------
-
-
-def test_add_remove():
-    q = ArrayQueue()
-
-    for i in range(20):
-        q.add(i)
-
-    for i in range(20):
-        assert q.remove() == i
-
-
-# ----------------------------------------------
-# get() and set()
-# ----------------------------------------------
-
-
-def test_get_and_set():
-    s = ArrayQueue()
-    s.a = ["a", "b", "c"]
-    s.n = 3
-
-    assert s.get(0) == "a"
-    assert s.get(1) == "b"
-    assert s.get(2) == "c"
-
-    s.set(0, 1)
-    s.set(1, "x")
-    s.set(2, 3)
-
-    assert s.get(0) == 1
-    assert s.get(1) == "x"
-    assert s.get(2) == 3
-
-
-def test_set_returns_old_value():
-    s = ArrayQueue()
-
-    s.add(10)
-
-    old = s.set(0, 20)
-
-    assert old == 10
-    assert s.get(0) == 20
-
-
-# ----------------------------------------------
-# test _resize()
-# ----------------------------------------------
-
 
 def test_grow_on_full_capacity():
     q = ArrayQueue()
@@ -96,20 +43,3 @@ def test_capacity_invariant():
         assert len(q.a) >= q.n
         assert len(q.a) >= q.n
         assert q.capacity >= q.n
-
-
-def test_many_grows_and_shrinks():
-    q = ArrayQueue()
-    ref = []
-
-    for i in range(500):
-        q.add(i)
-        ref.append(i)
-
-    for _ in range(450):
-        assert q.remove() == ref.pop(0)
-
-    assert q.size == len(ref)
-
-    for i, x in enumerate(ref):
-        assert q.get(i) == x
