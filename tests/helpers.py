@@ -61,9 +61,16 @@ def add_item(seq, x):
 
 def remove_item(seq):
     """Remove one element through whichever remove interface seq exposes."""
+
     if hasattr(seq, "remove_last"):
         seq.remove_last()
+
     elif hasattr(seq, "pop"):
         seq.pop()
+
+    elif hasattr(seq, "find"):
+        x = seq.find(float("-inf"))
+        seq.remove(x)
+
     else:
         seq.remove()

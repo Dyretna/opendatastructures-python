@@ -1,6 +1,7 @@
 import random
 from typing import Optional
 
+from ..base import BaseSet
 from ..validation import Validator as Val
 
 
@@ -32,7 +33,7 @@ class Node:
         return "\n".join(out)
 
 
-class SkiplistWithGet:
+class SkiplistWithRank(BaseSet):
     """
     A SkiplistSSet version that implements fast access to
     elements in O(log n) time with a get(i) method.

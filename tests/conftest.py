@@ -4,6 +4,8 @@ from implementations import (
     DEQUE_IMPLS,
     INDEX_IMPLS,
     QUEUE_IMPLS,
+    RANKED_SET_IMPLS,
+    SORTED_SET_IMPLS,
     STACK_IMPLS,
 )
 
@@ -24,6 +26,16 @@ def index_seq(request):
 
 @pytest.fixture(params=QUEUE_IMPLS, ids=_param_ids)
 def queue_seq(request):
+    return request.param()
+
+
+@pytest.fixture(params=RANKED_SET_IMPLS, ids=_param_ids)
+def ranked_set_seq(request):
+    return request.param()
+
+
+@pytest.fixture(params=SORTED_SET_IMPLS, ids=_param_ids)
+def sorted_set_seq(request):
     return request.param()
 
 

@@ -1,6 +1,8 @@
 import random
 from typing import Optional
 
+from ..base import BaseSet
+
 
 class Node:
     """
@@ -30,7 +32,7 @@ class Node:
         return "\n".join(out)
 
 
-class SkiplistSSet:
+class SkiplistSSet(BaseSet):
     """
     A probabilistic Sorted Set implementation based on a skiplist.
 

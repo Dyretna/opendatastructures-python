@@ -30,7 +30,12 @@ from ods.arrays import (
     Treque,
 )
 from ods.linked import DLList, SLList
-from ods.skip_list import SkiplistList
+from ods.skip_list import (
+    SkiplistList,
+    SkiplistSSet,
+    SkiplistWithFinger,
+    SkiplistWithRank,
+)
 
 # add_first/add_last/remove_first/remove_last
 # test_deque_ops.py
@@ -76,14 +81,34 @@ QUEUE_IMPLS = [
     MinQueue,
 ]
 
+
+# find/get
+RANKED_SET_IMPLS = [
+    SkiplistWithRank,
+]
+
+# find
+SORTED_SET_IMPLS = [
+    SkiplistSSet,
+    SkiplistWithFinger,
+    SkiplistWithRank,
+]
+
 # push/pop
 STACK_IMPLS = [
     ArrayStack,
     MinStack,
 ]
-
 # minimal base contract: size/is_empty + facades.
 # test_invariants.py
 ALL_IMPLS = sorted(
-    {*DEQUE_IMPLS, *INDEX_IMPLS, *QUEUE_IMPLS, *STACK_IMPLS}, key=lambda c: c.__name__
+    {
+        *DEQUE_IMPLS,
+        *INDEX_IMPLS,
+        *QUEUE_IMPLS,
+        *RANKED_SET_IMPLS,
+        *SORTED_SET_IMPLS,
+        *STACK_IMPLS,
+    },
+    key=lambda c: c.__name__,
 )

@@ -1,16 +1,16 @@
 import pytest
 
-from ods.linked import SELDeque
+from ods.linked import SEDeque
 
 
 @pytest.fixture
 def empty():
-    return SELDeque()
+    return SEDeque()
 
 
 @pytest.fixture
 def three():
-    d = SELDeque()
+    d = SEDeque()
     d.add_last(1)
     d.add_last(2)
     d.add_last(3)
@@ -19,7 +19,7 @@ def three():
 
 @pytest.fixture
 def many():
-    d = SELDeque(block_size=4)
+    d = SEDeque(block_size=4)
     for i in range(20):
         d.add_last(i)
     return d
@@ -55,7 +55,7 @@ class TestGetFirstGetLast:
         assert three.get_last() == 3
 
     def test_get_first_after_removals(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(5):
             d.add_last(i)
@@ -66,7 +66,7 @@ class TestGetFirstGetLast:
         assert d.get_first() == 2
 
     def test_get_last_after_removals(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(5):
             d.add_last(i)
@@ -79,7 +79,7 @@ class TestGetFirstGetLast:
 
 class TestBlockCreation:
     def test_add_last_creates_multiple_blocks(self):
-        d = SELDeque(block_size=4)
+        d = SEDeque(block_size=4)
 
         for i in range(20):
             d.add_last(i)
@@ -96,7 +96,7 @@ class TestBlockCreation:
         assert count > 1
 
     def test_add_first_creates_multiple_blocks(self):
-        d = SELDeque(block_size=4)
+        d = SEDeque(block_size=4)
 
         for i in range(20):
             d.add_first(i)
@@ -115,7 +115,7 @@ class TestBlockCreation:
 
 class TestBlockRemoval:
     def test_removing_everything_removes_all_blocks(self):
-        d = SELDeque(block_size=4)
+        d = SEDeque(block_size=4)
 
         for i in range(20):
             d.add_last(i)
@@ -128,7 +128,7 @@ class TestBlockRemoval:
         assert d.dummy.prev is d.dummy
 
     def test_single_empty_block_removed_after_remove_first(self):
-        d = SELDeque()
+        d = SEDeque()
 
         d.add_last(1)
 
@@ -138,7 +138,7 @@ class TestBlockRemoval:
         assert d.dummy.prev is d.dummy
 
     def test_single_empty_block_removed_after_remove_last(self):
-        d = SELDeque()
+        d = SEDeque()
 
         d.add_last(1)
 
@@ -150,7 +150,7 @@ class TestBlockRemoval:
 
 class TestRoundtripBehavior:
     def test_fifo_order(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(20):
             d.add_last(i)
@@ -160,7 +160,7 @@ class TestRoundtripBehavior:
         assert out == list(range(20))
 
     def test_reverse_fifo_order(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(20):
             d.add_first(i)
@@ -170,7 +170,7 @@ class TestRoundtripBehavior:
         assert out == list(range(20))
 
     def test_lifo_front(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(20):
             d.add_first(i)
@@ -180,7 +180,7 @@ class TestRoundtripBehavior:
         assert out == list(reversed(range(20)))
 
     def test_lifo_back(self):
-        d = SELDeque()
+        d = SEDeque()
 
         for i in range(20):
             d.add_last(i)
