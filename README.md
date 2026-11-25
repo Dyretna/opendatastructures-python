@@ -91,3 +91,14 @@ Verbose output:
 ```bash
 pytest -v
 ```
+
+## Notes on process
+
+I work through the exercises on my own as far as I can. When I hit a
+wall, I get help — usually by asking an LLM to draft tests, which I
+then debug against (and often learn from in the process), and for some
+of the more involved structures, more than that.
+
+Along the way I have several times believed I had solved something on
+my own, only for stricter tests to prove otherwise. Those moments have
+been the most instructive part of this project.

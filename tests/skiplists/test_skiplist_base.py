@@ -1,8 +1,9 @@
 import pytest
 
-from ods.skip_list import SkiplistSSet, SkiplistWithFinger, SkiplistWithRank
+from ods.skip_list import SESSet, SkiplistSSet, SkiplistWithFinger, SkiplistWithRank
 
 SSET_IMPLEMENTATIONS = [
+    SESSet,
     SkiplistSSet,
     SkiplistWithRank,
     SkiplistWithFinger,

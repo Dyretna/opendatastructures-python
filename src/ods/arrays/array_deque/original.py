@@ -10,10 +10,6 @@ class ArrayDeque(BaseList):
         self.n = 0
         self.j = 0
 
-    @property
-    def capacity(self):
-        return len(self.a)
-
     def get(self, i: int):
         if self.is_empty():
             raise IndexError("empty... ")
@@ -33,18 +29,18 @@ class ArrayDeque(BaseList):
     def add(self, i: int, x: Any):
         Val.validate_index_insert(i, self.size)
 
-        if self.n == self.capacity:
+        if self.n == len(self.a):
             self._resize_grow()
 
         if i < self.size / 2:
-            self.j = (self.j - 1) % self.capacity
+            self.j = (self.j - 1) % len(self.a)
             for k in range(i):
                 self._shift_section_left(k)
         else:
             for k in range(self.n, i, -1):
                 self._shift_section_right(k)
 
-        self.a[(self.j + i) % self.capacity] = x
+        self.a[(self.j + i) % len(self.a)] = x
         self.n += 1
 
     def add_all(self, i: int, c: list):
@@ -56,8 +52,8 @@ class ArrayDeque(BaseList):
             return
 
         # ensure capacity
-        if self.n + m > self.capacity:
-            new_capacity = self.capacity
+        if self.n + m > len(self.a):
+            new_capacity = len(self.a)
             while new_capacity < self.n + m:
                 new_capacity *= 2
 
@@ -65,7 +61,7 @@ class ArrayDeque(BaseList):
 
             # Left side
             for k in range(i):
-                b[k] = self.a[(self.j + k) % self.capacity]
+                b[k] = self.a[(self.j + k) % len(self.a)]
 
             # insertion
             for k in range(m):
@@ -73,7 +69,7 @@ class ArrayDeque(BaseList):
 
             # Right side
             for k in range(i, self.size):
-                b[k + m] = self.a[(self.j + k) % self.capacity]
+                b[k + m] = self.a[(self.j + k) % len(self.a)]
 
             self.a = b
             self.j = 0
@@ -96,7 +92,7 @@ class ArrayDeque(BaseList):
 
         Val.validate_index_access(i, self.size)
 
-        x = self.a[(self.j + i) % self.capacity]
+        x = self.a[(self.j + i) % len(self.a)]
 
         if i < self.n / 2:
             # left-side
@@ -104,16 +100,16 @@ class ArrayDeque(BaseList):
                 self._shift_section_right(r)
 
             self.a[self.j] = None
-            self.j = (self.j + 1) % self.capacity
+            self.j = (self.j + 1) % len(self.a)
         else:
             # right-side
             for k in range(i, self.size - 1):
                 self._shift_section_left(k)
 
-            self.a[(self.j + self.n - 1) % self.capacity] = None
+            self.a[(self.j + self.n - 1) % len(self.a)] = None
 
         self.n -= 1
-        if self.capacity > 4 and self.capacity >= 3 * self.size:
+        if len(self.a) > 4 and len(self.a) >= 3 * self.size:
             self._resize_shrink()
 
         return x
@@ -137,7 +133,7 @@ class ArrayDeque(BaseList):
         self._set_new_array(new_capacity)
 
     def _resize_shrink(self):
-        if self.capacity == 4:
+        if len(self.a) == 4:
             return
         else:
             new_capacity = len(self.a) // 2
@@ -146,7 +142,7 @@ class ArrayDeque(BaseList):
     def _set_new_array(self, new_capacity: int):
         b = [None] * new_capacity
         for k in range(self.size):
-            b[k] = self.a[(self.j + k) % self.capacity]
+            b[k] = self.a[(self.j + k) % len(self.a)]
         self.a = b
         self.j = 0
 
@@ -168,12 +164,12 @@ class ArrayDeque(BaseList):
 
             # shift logical elements left (not empty slots)
             for k in range(self.size - 1):
-                dst = (self.j + k) % self.capacity
-                src = (self.j + k + 1) % self.capacity
+                dst = (self.j + k) % len(self.a)
+                src = (self.j + k + 1) % len(self.a)
                 self.a[dst] = self.a[src]
 
             # write first at logical end
-            last = (self.j + self.size - 1) % self.capacity
+            last = (self.j + self.size - 1) % len(self.a)
             self.a[last] = first
 
     def _rotate_right(self, r: int) -> None:
@@ -183,12 +179,12 @@ class ArrayDeque(BaseList):
         r %= self.size
 
         for _ in range(r):
-            last = self.a[(self.j + self.size - 1) % self.capacity]
+            last = self.a[(self.j + self.size - 1) % len(self.a)]
 
             # shift logical elements right
             for k in range(self.size - 1, 0, -1):
-                dst = (self.j + k) % self.capacity
-                src = (self.j + k - 1) % self.capacity
+                dst = (self.j + k) % len(self.a)
+                src = (self.j + k - 1) % len(self.a)
                 self.a[dst] = self.a[src]
 
             # write last to first

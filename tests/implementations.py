@@ -31,6 +31,7 @@ from ods.arrays import (
 )
 from ods.linked import DLList, SLList
 from ods.skip_list import (
+    SESSet,
     SkiplistList,
     SkiplistSSet,
     SkiplistWithFinger,
@@ -89,6 +90,7 @@ RANKED_SET_IMPLS = [
 
 # find
 SORTED_SET_IMPLS = [
+    SESSet,
     SkiplistSSet,
     SkiplistWithFinger,
     SkiplistWithRank,

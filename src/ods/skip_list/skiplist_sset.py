@@ -55,10 +55,6 @@ class SkiplistSSet(BaseSet):
         self.h = 0
         self.n = 0
 
-    # --------------------------------------
-    # Morrins Interface
-    # --------------------------------------
-
     def find(self, x: int) -> Optional[int]:
         """Returns x if it exists, otherwise None"""
 
